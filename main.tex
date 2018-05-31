@@ -40,7 +40,7 @@
 %\end{abstract}
 
 \section{Introduction}
-Battery life is a factor that is critical to the operation of electric vehicles. Amongst its many effects on vehicle performance, it dictates the maximum distance that can be travelled on a single charging. Naturally, one would hope to maximize battery life.
+Battery life is a factor that is critical to the operation of electric vehicles (EVs). Amongst its many effects on vehicle performance, it dictates the maximum distance that can be travelled on a single charging. Naturally, one would hope to maximize battery life.
 
 In doing so, a common strategy being applied by vehicle designers is using a hybrid power supply, composed of a combination of a battery and a secondary energy storage. \cite{thounthong2009energy} The reason is that each of these storage devices is best suited for a specific energy demand (load) profile for the vehicle's operations, which may vary during the course of the trip. \cite{thounthong2009energy} By using a combination of storages, one may improve the efficiency of the energy delivery, and hence the battery life. Note that the secondary storage is usually a supercapacitor, and so will be referred to as such in this paper.
 
@@ -52,9 +52,9 @@ This paper begins by providing the context for these two programming approaches.
 \section{Background and Literature Review}
 In order to improve battery lifetime in this vehicle energy management problem, experiments \cite{thounthong2009energy} show that it should be operated with steady output power, whereas the supercapacitor must be operated in the opposite manner \cite{thounthong2009energy}. DP is an iterative method of optimization that can be used for such optimal control. Previously\cite{thounthong2009energy}, it has been applied to determine the optimal amount of energy to charge and discharge from a battery (the control) so as to satisfy an energy demand ("load"). This paper extends upon that model by adding the supercapacitor operating in parallel.
 
-The DP approach requires that the state (energy) and control variables be both quantized in value and discretized in time. For this application of DP, because precise control must be done with very small time steps to satisfy the fluctuating demand over a timeframe of hours, an extremely large number of iterations and fine discretization is involved.\cite{bertsekas1995dynamic} IHDP is a type of DP that allows for optimizing over these practically "infinite" number of iterations.
+The DP approach requires that the state (energy) and control variables be both quantized in value and discretized in time. For this application of DP, because precise control must be done with very small time steps to satisfy the fluctuating demand over a timeframe of hours, an extremely large number of iterations and fine discretization are involved.\cite{bertsekas1995dynamic} IHDP is a type of DP that allows for optimizing over these practically "infinite" number of iterations.
 
-As will be explained in Section 4, a finite number of iterations is sufficient to approximate the solution to the IHDP.\cite{bertsekas1995dynamic} However, it still suffers from the issue of the embedded exhaustive search taking very long for the fine resolution required for the control. In Section 5, it is shown that LP can be used to determine the optimal costs to which the IHDP converges over its iterations.\cite{bertsekas1995dynamic} Moreover, \cite{4220813} shows that it is possible to subsequently obtain the optimal control "policy" by taking the dual. Given the rapidity of current LP solvers in comparison to exhaustive search, the author was motivated to follow this approach, as others have done.
+As will be explained in Section 4, a finite number of iterations is sufficient to approximate the solution to the IHDP.\cite{bertsekas1995dynamic} However, it still suffers from the issue of the embedded exhaustive search taking very long when fine resolution in the control is required. In Section 5, it is shown that LP can be used to determine the optimal costs to which the IHDP converges over its iterations.\cite{bertsekas1995dynamic} Moreover, \cite{4220813} shows that it is possible to subsequently obtain the optimal control "policy" by taking the dual. Given the rapidity of current LP solvers in comparison to exhaustive search, the author was motivated to follow this approach, as others have done.
 
 
 \section{Model}
@@ -349,7 +349,7 @@ Having characterized the policy obtained from solving the IHDP, the final step i
 In this application, the cost $J(x)$ is a 3-dimensional function of the state $x:=(E_{1},E_{2},L)$, and so would be stored as a 3D matrix for discrete states. A metric for the total error was chosen to be:
 \begin{displaymath}
     \frac{\norm{J^{*}_{IHDP}-J_{LP}}_{F}}{\norm{J_{LP}}_{F}}
-\end{displaymath} where $\norm{\cdot}_{F}$ denotes the Frobenius norm, $J^{*}_{IHDP}$ is the optimal cost from solving the IHDP, and $J_{LP}$ is the optimal cost from solving the LP. The partially converged cost in IHDP ($J_{IHDP}$) approaches the optimal (converged) cost $J^{*}_{IHDP}$ as the convergence tolerance $\epsilon$ decreases. Hence, if for a given size of state space the error:
+\end{displaymath} where $\norm{\cdot}_{F}$ denotes the Frobenius norm, $J^{*}_{IHDP}$ is the optimal cost from solving the IHDP, and $J_{LP}$ is the optimal cost from solving the LP. The partially converged cost in IHDP ($J_{IHDP}$) approaches the optimal (converged) cost $J^{*}_{IHDP}$ as the convergence tolerance $\epsilon$ decreases. Hence, if for a given size of state space the error.
 \begin{displaymath}
     e_{tot}=\frac{\norm{J_{IHDP}-J_{LP}}_{F}}{\norm{J_{LP}}_{F}}
 \end{displaymath} monotonically decreases as $\epsilon$ decreases, it is known that the LP leads to an equivalent solution as the IHDP. The following table shows results indicating that this is indeed the case:
@@ -370,7 +370,7 @@ In this application, the cost $J(x)$ is a 3-dimensional function of the state $x
 	\end{center}
 \end{table} Note that this is for a low tolerance in the convergence error of the LP ($\epsilon_{LP}=1e-9$), which is the tolerance on satisfying the constraints of the LP. Hence, it is taken that the LP gives the more accurate solution as $e_{tot}$ decreases to 0.
 
-Finally, in addition to quantifying the error for LP, the LP is also compared to IHDP based on computational complexity. The following table provides simulation results showing that LP generally takes longer to converge for small problems, but is faster for large problems. %While the size of problems and number of cost evaluations were compared in Sections 4 and 5 for the general case, the convergence time is very application-dependent.
+Finally, in addition to quantifying the error for LP, the LP is also compared to IHDP based on computational complexity. The following table provides simulation results for the number of iterations as the model size and tolerances (of \textit{both} programs) are varied.
 
 \begin{table}[htbp]
 	\begin{center}
@@ -378,23 +378,29 @@ Finally, in addition to quantifying the error for LP, the LP is also compared to
 			\hline
 			\textbf{Size of}&\textbf{Tolerances}&\multicolumn{2}{|c|}{\textbf{Number of Iterations}} \\
 			\cline{3-4} 
-			\textbf{Problem} & & \textbf{IHDP Convergence} &  \textbf{LP Simplex Method} \\
+			\textbf{Problem} & \textbf{$(\epsilon=\epsilon_{LP})$} & \textbf{IHDP Convergence} &  \textbf{LP Simplex Method} \\
 			\hline
 			N=30, M=10& 1e-3 & 5 & 15 \\
 			\hline
-			N=30, M=10& 1e-6 & 12 & 17 \\
+			N=30, M=10& 1e-4 & 12 & 17 \\
 			\hline
 			N=66, M=16& 1e-3 & 44 & 38 \\
 			\hline
-			N=66, M=16& 1e-6 & 52 & 47 \\
+			N=66, M=16& 1e-4 & 52 & 47 \\
 			\hline
 		\end{tabular}
 		\label{tab1}
 	\end{center}
-\end{table}
+\end{table}While the size of problems and number of cost evaluations were compared in Sections 4 and 6 for the general case, the number of iterations very application-dependent, as previously explained. The experimental results in the above table show that LP generally takes longer to converge for small problems, but is faster for large problems. Hence, this suggests that the LP formulation is a more efficient program for this two-storage application.
 
 \section{Conclusion}
-In conclusion, this paper has compared the IHDP solution for optimal control to its reformulation as an LP. Theoretical comparison has shown that the LP is likely computationally less expensive. However, practical simulation using the LP formulation is prone to error, and so only an application-specific reduced LP can be compared to IHDP. The results show that optimal control of two storage devices is acheived.
+In conclusion, this paper has developed and optimized a model for energy transfers from two parallel storage devices satisfy a random demand. The model is an extension of the case with a single storage device, and was formulated using dynamic programming. Its optimal control policy can be applied to exactly satisfy a real-time demand, making it suitable for applications such as EVs.
+
+To better meet the timescales and computational limits associated with this application, the DP was modified in two steps. Firstly, value iteration was used to solve the DP as an IHDP, which allowed for determining the optimal controls with long application times. Additionally, the IHDP was reformulated as an equivalent LP, with benefits coming in reducing the computational time at the expense of more memory use.
+
+Lastly, the final program was simulated with three classes of demand to determine the optimal control in each case. As expected, it was found that high-energy or steady demands lead to more use of the battery, whereas fluctuating demand leads to more use of the complementary storage device. This means the policy produced by the program should work to reduce battery degradation, based on literature reviewed.
+
+The final simulation results confirmed that the final LP is indeed a more efficient algorithm in terms of reducing time. However, further work remains to be done to scale the problem to the energies expected in a real application, where minimizing over the large number of states remains a challenge.
 
 \printbibliography
 
