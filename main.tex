@@ -44,9 +44,9 @@ Battery life is a factor that is critical to the operation of electric vehicles.
 
 In doing so, a common strategy being applied by vehicle designers is using a hybrid power supply, composed of a combination of a battery and a secondary energy storage. \cite{thounthong2009energy} The reason is that each of these storage devices is best suited for a specific energy demand (load) profile for the vehicle's operations, which may vary during the course of the trip. \cite{thounthong2009energy} By using a combination of storages, one may improve the efficiency of the energy delivery, and hence the battery life. Note that the secondary storage is usually a supercapacitor, and so will be referred to as such in this paper.
 
-To optimally supply energy by controlling the storage devices, one can apply a technique called dynamic programming (DP). DP is well suited for optimal control in this situation because it can generate a control policy that takes into account any possible demand and can be administered at the rates at which demands arrive [HybridStorageMPC]. The novelty of this paper lies in formulating the two-storage stochastic control problem as a DP, and extending it to the timescales of electric vehicle operation via infinite horizon DP (IHDP). Because IHDP is computationally expensive to solve, the paper also reformulates it as a linear program (LP), making it amenable to fast solution by current solvers. 
+To optimally supply energy by controlling the storage devices, one can apply a technique called dynamic programming (DP). DP is well suited for optimal control in this situation because it can generate a control policy that takes into account any possible demand and can be administered at the rates at which demands arrive [__HybridStorageMPC__]. The novelty of this paper lies in formulating the two-storage stochastic control problem as a DP, and extending it to the timescales of electric vehicle operation via infinite horizon DP (IHDP). Because IHDP is computationally expensive to solve, the paper also reformulates it as a linear program (LP), making it amenable to fast solution by current solvers. 
 
-This paper begins by providing the context for these two programming approaches. Upon modelling the problem in Section 3, the DP and IHDP problems are formulated in Section 4 and their issues explained. In Sections 5-6, the IHDP is re-cast as the LP, and its relative computational benefits shown. Finally, in Sections 7-8, numerical results for the vehicle application are shown to better compare the two approaches. Note that the IHDP and LP are compared both analytically and numerically.
+This paper begins by providing the context for these two programming approaches. Upon modelling the problem in Section 3, the DP and IHDP problems are formulated in Section 4 and their issues explained. In Sections 5-6, the IHDP is re-cast as the LP. Finally, in Sections 7-8, numerical results for the vehicle application are shown to draw conclusions on the optimal response to various demand patterns. Note that the IHDP and LP are compared both analytically and numerically to show the LP's relative computational benefits.
 
 
 \section{Background and Literature Review}
@@ -125,7 +125,7 @@ and state equations $f_{1}(\cdot)$ and $f_{2}(\cdot)$ for the battery and superc
     \item \begin{math}E_{1}(t+1)=\beta_{1}E_{1}(t)-\frac{1}{\alpha_{1}^{D}}D_{1}(t)\end{math}
     \item \begin{math}E_{2}(t+1)=\beta_{2}E_{2}(t)+\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)\end{math}\newline
 \end{itemize}
-Note that the second difference equation (for the supercapacitor) was derived in [ModelingPwrBalancing]. The first one (for the battery) is exactly the same but does not have a charging term, since it is taken that the battery can only discharge.
+Note that the second difference equation (for the supercapacitor) was derived in [__ModelingPwrBalancing__]. The first one (for the battery) is exactly the same but does not have a charging term, since it is taken that the battery can only discharge.
 
 In the general case, for state $x(t):= (E_{1}(t),E_{2}(t))$, control $u(t):= (D_{1}(t),D_{2}(t))$ and random perturbation $w(t):= L(t)$, the cost function \eqref{eq:initCostFnc} may be expressed in the form:
 \begin{equation}J=\mathop{\E}_{w(t)} \Biggl\{\min_{u}\left[\sum_{t=0}^{T-1}g(x(t),u(t),w(t))\right]\Biggr\}\end{equation}
@@ -229,10 +229,10 @@ This form cannot yet be solved because there are two cost vectors. One may reduc
 
 Firstly, one can consider just the subset of costs associated with the $p^{th}$ control. This is done because each of the sets of linear inequalities in \eqref{eq:prelimLP} ($\forall i,j$) is of the same form, so the full matrix formulation will consist just of the concatenation of the individual matrix equations. For the $p^{th}$ control, the $p^{th}$ expression on the left in the set of linear inequalities of \eqref{eq:prelimLP} can be expressed in the form:
 
-\begin{gather} \label{eq:mtxLPineq}
+\begin{gather}\label{eq:mtxLPineq}
 \begin{psmallmatrix}
 & \lambda_{1,1}\\
-& \vdotswithin\\
+& \vdots\\
 & \\
 & \lambda_{N,M}
 \end{psmallmatrix}
@@ -245,8 +245,8 @@ P(w_{1}|x'_{b}) \hdots  P(w_{M}|x'_{b}) \\
 & P(w_{1}|x'_{a}) \hdots  P(w_{M}|x'_{a})  \\
 & & \ddots
 \end{psmallmatrix}
-\lambda^{*}
-\end{gather}
+\lambda^{*}\end{gather}
+
 
 where $\lambda^{*} := \begin{psmallmatrix}
 \lambda_{b,1} \hdots \lambda_{b,M} \lambda_{a,1}\hdots \lambda_{a,M} \hdots \end{psmallmatrix}^{T}$ is the vector of next state costs and this is the matrix of transition probabilities when the $p^{th}$ control is applied. Note that because this is specifically the $p^{th}$ expression, the subscript p for x' is suppressed for brevity.
@@ -258,11 +258,11 @@ Importantly, the notation $x'_{i'}:=x_{i,j}$ is used to emphasize that the next 
 \begin{psmallmatrix}
     \bold{0} & \hdots & \bold{0} & \bold{I} & \bold{0} & \hdots & \bold{0} \\
     \bold{0} & \bold{I} & \bold{0} & \bold{0} & \hdots & \hdots & \bold{0} \\
-    & & & \vdotswithin\\
+    & & & \vdots\\
 \end{psmallmatrix}
 \begin{psmallmatrix}
     & \lambda_{1,1}\\
-    & \vdotswithin\\
+    & \vdots\\
     & \\
     & \lambda_{N,M}
 \end{psmallmatrix}
@@ -351,13 +351,13 @@ In this application, the cost $J(x)$ is a 3-dimensional function of the state $x
     \frac{\norm{J^{*}_{IHDP}-J_{LP}}_{F}}{\norm{J_{LP}}_{F}}
 \end{displaymath} where $\norm{\cdot}_{F}$ denotes the Frobenius norm, $J^{*}_{IHDP}$ is the optimal cost from solving the IHDP, and $J_{LP}$ is the optimal cost from solving the LP. The partially converged cost in IHDP ($J_{IHDP}$) approaches the optimal (converged) cost $J^{*}_{IHDP}$ as the convergence tolerance $\epsilon$ decreases. Hence, if for a given size of state space the error:
 \begin{displaymath}
-    e_{tot}=\frac{\norm{J^_{IHDP}-J_{LP}}_{F}}{\norm{J_{LP}}_{F}}
+    e_{tot}=\frac{\norm{J_{IHDP}-J_{LP}}_{F}}{\norm{J_{LP}}_{F}}
 \end{displaymath} monotonically decreases as $\epsilon$ decreases, it is known that the LP leads to an equivalent solution as the IHDP. The following table shows results indicating that this is indeed the case:
 \begin{table}[htbp]
 	\begin{center}
 		\begin{tabular}{|c|c|c|}
 			\hline
-			\textbf{IHDP Convergence Tolerance (\epsilon)}&\textbf{Iterations of IHDP}&\textbf{e_{tot}} \\
+			\textbf{IHDP Convergence Tolerance ($\epsilon)$}&\textbf{Iterations of IHDP}&\textbf{$e_{tot}$} \\
 			\hline
 			1e-3& 5 & 8.24\% \\
 			\hline
