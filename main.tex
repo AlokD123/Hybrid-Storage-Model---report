@@ -8,8 +8,6 @@
 \usepackage{textcomp}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \usepackage{mathtools}
 
 \usepackage[backend=biber]{biblatex}
@@ -91,11 +89,11 @@ There are two relevant costs for this model. For each, the minimization is done 
 	This objective is convex. A quadratic cost is chosen as referenced most commonly in literature [bambang2014energy], where it used to penalize more for high excursions.
 	\item Power loss due to energy transfers
 	\begin{multline}
-    J_{loss}=\mathop{\E}_{L(t)} \Biggl\{min\left[\sum_{t=0}^{T-1}
+    J_{loss}=\mathop{\E}_{L(t)} \Biggl\{min[\sum_{t=0}^{T-1}
 	(1-\alpha_{1}^{D})D_{1}(t)+\\
 	(1-\alpha_{2}^{C})C_{2}(t)+
 	(1-\alpha_{2}^{D})D_{2}(t)
-	\right]\Biggr\}\end{multline}
+	]\Biggr\}\end{multline}
 	This objective is constrained to be non-negative. The energy transfers of charging ($C_{2}$) and discharging ($D_{1}$ and $D_{2}$) are arbitrarily chosen to be weighted by their inefficiencies ($1-\alpha$), as this penalizes the less efficient energy transfers.
 \end{enumerate}
 
@@ -105,12 +103,12 @@ Hence, the sum of the objective functions (see below) is convex and non-negative
 Based on this cost function, the preliminary optimization problem is:
 
 \begin{multline} \label{eq:initCostFnc}
-    \mathop{\E}_{L(t)} \Biggl\{\min_{D_{1},D_{2}}\left[\sum_{t=0}^{T-1}
+    \mathop{\E}_{L(t)} \Biggl\{\min_{D_{1},D_{2}}[\sum_{t=0}^{T-1}
 	(1-\alpha_{1}^{D})D_{1}(t)+
 	(1-\alpha_{2}^{C})C_{2}(t)+\\
 	(1-\alpha_{2}^{D})D_{2}(t)+
 	K\left[D_{1}(t)\right]^{2}
-	\right]\Biggr\}\end{multline}
+	]\Biggr\}\end{multline}
 s.t.
 \begin{itemize}
     \item Bounds on stored energy: 
@@ -231,7 +229,7 @@ This form cannot yet be solved because there are two cost vectors. One may reduc
 
 Firstly, one can consider just the subset of costs associated with the $p^{th}$ control. This is done because each of the sets of linear inequalities in \eqref{eq:prelimLP} ($\forall i,j$) is of the same form, so the full matrix formulation will consist just of the concatenation of the individual matrix equations. For the $p^{th}$ control, the $p^{th}$ expression on the left in the set of linear inequalities of \eqref{eq:prelimLP} can be expressed in the form:
 
-\begin{gather}\label{eq:mtxLPineq}
+\begin{gather} \label{eq:mtxLPineq}
 \begin{psmallmatrix}
 & \lambda_{1,1}\\
 & \vdotswithin\\
@@ -247,7 +245,8 @@ P(w_{1}|x'_{b}) \hdots  P(w_{M}|x'_{b}) \\
 & P(w_{1}|x'_{a}) \hdots  P(w_{M}|x'_{a})  \\
 & & \ddots
 \end{psmallmatrix}
-\lambda^{*}\end{gather}
+\lambda^{*}
+\end{gather}
 
 where $\lambda^{*} := \begin{psmallmatrix}
 \lambda_{b,1} \hdots \lambda_{b,M} \lambda_{a,1}\hdots \lambda_{a,M} \hdots \end{psmallmatrix}^{T}$ is the vector of next state costs and this is the matrix of transition probabilities when the $p^{th}$ control is applied. Note that because this is specifically the $p^{th}$ expression, the subscript p for x' is suppressed for brevity.
