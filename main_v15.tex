@@ -19,16 +19,18 @@
 
 \renewcommand*{\bibfont}{\footnotesize}
 \renewcommand\IEEEkeywordsname{Index Terms}
-\IEEEoverridecommandlockouts
 
 \begin{document}
 
 \title{Optimal Energy Management of Electric Vehicles with Dual Storage}
 
-\author{Alok~Deshpande,~\IEEEmembership{Student Member,~IEEE}, and~Joshua~A.~Taylor,~\IEEEmembership{Member,~IEEE}%
-\thanks{A. Deshpande and J.A. Taylor are with The Edward S. Rogers Sr. Department of Electrical \& Computer Engineering, University of Toronto, Toronto, Ontario, Canada, M5S 3G4. Email: \{\texttt{alok.deshpande@mail.,josh.taylor@}\}\texttt{utoronto.ca}}%%
-% \thanks{Manuscript received X; revised X.}
+\author{Josh Taylor \textit{Member, IEEE} and Alok Deshpande \textit{Student Member, IEEE} %\IEEEauthorblockN{Alok Deshpande}
+%\IEEEauthorblockA{University of Toronto - Energy Systems}
 }
+
+%\newenvironment{psmallmatrix}
+%  {\left[\begin{smallmatrix}}
+%  {\end{smallmatrix}\right]}
 
 \maketitle
 
@@ -42,9 +44,9 @@ Combining storages with different characteristics can improve the performance an
 Electric vehicles, approximate dynamic programming, batteries, supercapacitors.\end{IEEEkeywords}
 
 \section{Introduction}
-Battery life is an important consideration in electric vehicle (EV) operation. An aging battery experiences a drop in energy capacity \cite{8449100}, which reduces the maximum distance that can be travelled on a single charge. One promising way to prolong battery life is to use a hybrid energy storage system, composed of a combination of a battery and a secondary energy storage in parallel \cite{thounthong2009energy}, such as a supercapacitor \cite{thounthong2009energy,bambang2014energy,7939849}. 
+Battery life is an important consideration in electric vehicle (EV) operation. An aging battery experiences a drop in energy capacity \cite{8449100}, which reduces the maximum distance that can be travelled on a single charge. One promising way to prolong battery life is to use a hybrid energy storage system, composed of a combination of a battery and a secondary energy storage in parallel \cite{thounthong2009energy}, such as a supercapacitor \cite{bambang2014energy,thounthong2009energy,7939849}. 
 
-Dynamic programming (DP) has previously been been applied in this context to determine an optimal sequence of controls --- that is to say, energy discharges from the battery and supercapacitor --- which satisfies a sequence of energy demands. Reference \cite{su2013modeling} has applied DP to a single battery. We extend this to the two-storage case. References \cite{8330176} and \cite{8315074} have both solved the problem under the assumption of an infinite horizon, and we do so similarly.
+Dynamic programming (DP) has previously been been applied in this context to determine an optimal sequence of controls --- that is to say, energy discharges from the battery and supercapacitor --- that satisfies a sequence of energy demands. Reference \cite{su2013modeling} has applied DP to a single battery. We extend this to the two-storage case. References \cite{8330176} and \cite{8315074} have both solved the problem under the assumption of an infinite horizon, and we do so similarly.
 
 Our approach differs from these papers as follows. We first reformulate the infinite horizon DP as a linear program (see, e.g., \cite{Bertsekas:2007:DPO:1396348}). We then construct an approximation using the basis function technique given in \cite{deFarias:2003:LPA:970869.970918}, and generate basis functions for the approximation using the methods of \cite{Bellman:1957} and \cite{Bellman1962}. %\cite[pp. 323--324]{Bellman1962}.
 
@@ -52,7 +54,7 @@ We physically model the problem in Section II and pose the infinite horizon DP i
 
 
 \section{Model}
-In this section, we model the two storage device optimization problem. Let $E_{h}(t)$ and $D_{h}(t)$ denote the energy stored in and energy discharged from device $h$ at time instant $t$, respectively. Here $h=1$ refers to the battery and $h=2$ refers to the supercapacitor. Let $L(t)$ be the energy demand imposed on the system, and $C_{h}(t)$ be the energy moved into device $h$ by charging at time $t$. We define the state to be $x(t)=[E_{1}(t),E_{2}(t),L(t)]^{T}$ and the control to be $u(t)=[D_{1}(t),D_{2}(t)]^{T}$. Note that $C_{2}(t)$ is not part of the control because it is a dependent variable through the energy supply-demand balance, as explained below.
+In this section, we model the two storage device optimization problem. Let $E_{h}(t)$ and $D_{h}(t)$ denote the energy stored in and energy discharged from device $h$ at time instant $t$, respectively. Here $h=1$ refers to the battery and $h=2$ refers to the supercapacitor. Let $L(t)$ be the energy demand imposed on the system, and $C_{h}(t)$ be the energy moved into device $h$ by charging at time $t$. We define the state to be $x(t)=E_{1}(t),E_{2}(t),L(t)$ and the control to be $u(t)=D_{1}(t),D_{2}(t)$. Note that $C_{2}(t)$ is not part of the control because it is a dependent variable through the energy supply-demand balance, as explained below.
 
 The state equation for the battery without regenerative braking is:
 \begin{equation} \label{eq:BattStateEqn}
@@ -60,18 +62,15 @@ The state equation for the battery without regenerative braking is:
 \end{equation} Likewise, the state equation for the supercapacitor is:
 \begin{equation} \label{eq:SupercStateEqn}
     E_{2}(t+1)=\beta_{2}E_{2}(t)+\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)
-\end{equation} Here, $\alpha^{C}_{h}$ and $\alpha^{D}_{h}$ respectively denote the charging and discharging efficiencies of device $h$, and $\beta_{h}$ is the leakage of device $h$. The energy supply-demand balance also imposes the following constraint: $D_{1}(t) + D_{2}(t) - C_{2}(t) = L(t)$. We write the state transition more concisely as $x(t+1)=f(x(t),u(t),w(t))$, where $w(t)$ is a bounded random variable described below.
+\end{equation} Here, $\alpha^{C}_{h}$ and $\alpha^{D}_{h}$ respectively denote the charging and discharging efficiencies of device $h$, and $\beta_{h}$ is the leakage of device $h$. The energy supply-demand balance also imposes the following constraint: $D_{1}(t) + D_{2}(t) - C_{2}(t) = L(t)$. We write the state transition more concisely as $x(t+1)=f(x(t),u(t),w(t))$, where $w(t)$ is a bounded random variable described below after \eqref{eq:initCostFnc}.
 
 In this model, the energy in storage device $h$ is bounded in the range $E_{h}^{\min}\leq E_{h}(t)\leq E_{h}^{\max}$ where $E_{h}^{\max}$ is the upper bound and $E_{h}^{\min}$ is the lower bound, normally equal to zero. We discretize this range into $N_{h}$ energy levels for the device $h$, and define $N=N_{1}N_{2}$. The charging and discharging energies are constrained to the ranges $0\leq C_{h}(t)\leq C_{h}^{\max}$ and $0\leq D_{h}(t)\leq D_{h}^{\max}$, where $C_{h}^{\max}$ and $D_{h}^{\max}$ are the upper bounds on the charging and discharging rates, respectively. They are also discretized, as explained below after \eqref{eq:initCostFnc}.
 
 
-There are two relevant costs in this model. The first is the loss of energy due to transfers between the devices, which is:
-\begin{displaymath}
-\bigg(\frac{1}{\alpha_{1}^{D}}-1\bigg)D_{1}(t)+(1-\alpha_{2}^{C})C_{2}(t)+\bigg(\frac{1}{\alpha_{2}^{D}}-1\bigg)D_{2}(t)
-\end{displaymath} The other cost is that for the discharge rate for the battery, simply given by $K(D_{1}(t))^{2}$. Here $K$ is a weighting for this cost relative to the cost of energy loss. This cost penalizes larger power transfers \cite{bambang2014energy}, which cause greater battery degradation. We define the stage cost of the optimization problem to be:
+There are two relevant costs in this model. The first is the loss of energy due to transfers between the devices, $\big(\frac{1}{\alpha_{1}^{D}}-1\big)D_{1}(t)+(1-\alpha_{2}^{C})C_{2}(t)+\big(\frac{1}{\alpha_{2}^{D}}-1\big)D_{2}(t)$. The other cost is that for the discharge rate for the battery, simply given by $K(D_{1}(t))^{2}$. Here $K$ is a weighting for this cost relative to the cost of energy loss. This cost penalizes larger power transfers \cite{bambang2014energy}, which cause greater battery degradation. We define the stage cost of the optimization problem to be:
 \begin{align*}
-    g(E_{1}(t),E_{2}(t),L(t),D_{1}(t),D_{2}(t))=\delta^{T}\chi
-\end{align*} where $\delta=\left[\big(\frac{1}{\alpha_{1}^{D}}-1\big),(1-\alpha_{2}^{C}),\big(\frac{1}{\alpha_{2}^{D}}-1\big),K\right]^{T}$ and $\chi=\left[D_{1}(t),C_{2}(t),D_{2}(t),(D_{1}(t))^{2}\right]^{T}$.
+    g(E_{1}(t),E_{2}(t),L(t),D_{1}(t),D_{2}(t))&=\big(\frac{1}{\alpha_{1}^{D}}-1\big)D_{1}(t) +(1-\alpha_{2}^{C})C_{2}(t)\\& +\big(\frac{1}{\alpha_{2}^{D}}-1\big)D_{2}(t) +K(D_{1}(t))^{2}
+\end{align*}
 
 We collect this objective and the above constraints in the below convex optimization problem:
 \begin{multline} \label{eq:initCostFnc}
@@ -79,21 +78,21 @@ We collect this objective and the above constraints in the below convex optimiza
 \end{multline}
 subject to
 \begin{flalign*}
-& E_{h}^{\min}\leq E_{h}(t)\leq E_{h}^{\max}, h=1,2\\
+& E_{h}^{\min}\leq E_{h}(t)\leq E_{h}^{\max}\\
 & 0\leq C_{2}(t)\leq C_{2}^{\max}\\
-& 0\leq D_{h}(t)\leq D_{h}^{\max}, h=1,2\\
+& 0\leq D_{h}(t)\leq D_{h}^{\max}\\
 & D_{1}(t) + D_{2}(t) - C_{2}(t) = L(t)\\
 & E_{1}(t+1)=\beta_{1}E_{1}(t)-\frac{1}{\alpha_{1}^{D}}D_{1}(t)\\
 & E_{2}(t+1)=\beta_{2}E_{2}(t)+\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)
 \end{flalign*}
-Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1},D_{2}]^{T}$. The range of the discharged energies for each device $h$, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $P_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $P=P_{1}P_{2}$.
+Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1} D_{2}]^{T}$. The range of the discharged energies, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $P_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $P=P_{1}P_{2}$.
 
 The optimal value function \eqref{eq:initCostFnc} may be expressed in the general form:
 \begin{equation} \label{eq:FHDP}
 	J_{0}(x(0))=\min \mathop{\E}_{w}\left[\sum_{t=0}^{T-1}g(x(t),u(t),w(t))\right]\end{equation}
 The optimization \eqref{eq:FHDP} may then be written as the DP:
 \begin{displaymath}
-J_{t}(x(t))=\min_{u(t)} g(x(t),u(t)) + \mathop{\E}_{w(t)}\left[J_{t+1}(f(x(t),u(t),w(t)))\right]
+J_{t}(x(t))=\min_{u(t)} g(x(t),u(t)) + \mathop{\E}_{w(t)} \{J_{t+1}[f(x(t),u(t),w(t))]\}
 \end{displaymath}
 starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref{eq:initCostFnc}, which can be expressed as the set:
 \begin{flalign*}
@@ -107,53 +106,45 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
 
 In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1))$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}$, where $L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, may occupy. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,2,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,P\}$. By the above definition, $X=Y\times W$, and $X$ is indexed by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, which is to say that --- for example --- $x_{i}$ is the $i^{th}$ element in set $X$. Then, let $x_{i}$ be the state at time $t$, and $x_{j}$ be any state in $X$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
+As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)$, may not lie in $X$. We term this as the state \textit{falling off the grid of discretization}, and use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define four sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of vectors $(E_{1},E_{2})$, indexed by $\gamma \in\{1,2,...,N\}$; $X=Y\times W$ as the set of states, indexed by $i\in\{1,...,NM\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,P\}$. We use subscripts to index the vectors each set, which is to say that --- for example --- $x_{i}$ is the $i^{th}$ vector in set $X$. Then, let $x_{i}$ be the state at time $t$, and $x_{j}$ be any state in $X$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite{715376} when $x_{j}\not\in X$:
 \begin{equation} \label{eq:InterpMap}
 	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
-\end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
+\end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are weightings that depend on the manner of the multilinear interpolation. The weightings have the property $0\leq q_{i',j}\leq 1$.
 
-First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{th}$ value of energy $E_{1}$, and $b_{m}$ be the $m^{th}$ value of energy $E_{2}$. As well, let $\Psi=\{\psi\in\mathbb{R}^{2}\mid [a_{l},b_{m}]^{T}\leq\psi<[a_{l+1},b_{m+1}]^{T}\}$. Then, the interpolation weights are $q_{l,m,j}$, where:
-%\begin{displaymath}q_{l,m,j}=
-%\left\{
-%\begin{array}{l}
-%\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{1.6cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1},\\ \times \Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.3cm}b_{m}\leq b_{j}< b_{m+1}\\\\
-%0		   \hspace{4.8cm} \text{otherwise}
-%\end{array}
-%\right.
-%\end{displaymath}
-\begin{displaymath}q_{l,m,j}=
+To determine the form of the weightings, we note that the state has only two components that can be off the grid ($E_{1}$ and $E_{2}$), since the demand is a discrete random variable that lies in the set $W$ by definition. Hence, we use bilinear interpolation for the weightings. Let $a=E_{1}$ and $b=E_{2}$ be the two components. Furthermore, let $\bold{i'}=(l',m')$ replace $i'$ to refer to the indices of the two energy components of the state $x_{i'}\in X$. This is to say that $a_{l'}\in X_{1}\hspace{0.1cm}\forall\hspace{0.1cm}l'\in\{1,2,..., N_{1}\}$ and $b_{m'}\in X_{2}\hspace{0.1cm}\forall\hspace{0.1cm} m'\in\{1,2,..., N_{2}\}$, where $X_{1}$ and $X_{2}$ are sets of the battery and supercapacitor discrete energy levels respectively. Then, the weightings for bilinear interpolation are $q_{\bold{i'},j}=q_{l',m',j}$, where:
+\begin{displaymath}q_{l',m',j}=
 \left\{
 \begin{array}{l}
-\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big)\hspace{0.1cm} \text{if} \hspace{0.1cm} [a_{j},b_{j}]^{T}\in\Psi\\
-0		   \hspace{4.4cm} \text{otherwise}
+\Big(1-\frac{a_{j}-a_{l'}}{a_{l'+1}-a_{l'}}\Big)\Big(1-\frac{b_{j}-b_{m'}}{b_{m'+1}-b_{m'}}\Big)\hspace{0.1cm} \text{if} \hspace{0.1cm} a_{l'}\leq a_{j}< a_{l'+1},\\ \hspace{5.3cm}b_{m'}\leq b_{j}< b_{m'+1}\\
+0		   \hspace{4.8cm} \text{otherwise}
 \end{array}
 \right.
 \end{displaymath} Here, $a_{j}$ and $b_{j}$ are components of the state $x_{j}\not\in X$.
 
-%In equation \eqref{eq:InterpMap}, we have shown the mapping between the value function at any state $x_{i'}\in X$ and $J_{t+1}(x_{j})$ when $x_{j}\not\in X$ is the next state. A similar mapping exists when $x_{j}\in X$, but may or may not be the next state:
-%\begin{equation} \label{eq:NextStateMap}
-	%J_{t+1}(x_{j})=\sum_{i'}^{MN}e_{i',j}J_{t+1}(x_{i'})
-%\end{equation} Here $e_{i',j}=1$ if $x_{j}=x_{i'}$ and if $x_{j}$ is the next state, and $e_{i',j}=0$ otherwise. We can then express the linear combinations in equations \eqref{eq:InterpMap} and \eqref{eq:NextStateMap} in matrix form by a matrix $F$. Let $j$ denote the row index and $i$ the column index of $F$. Then, the structure of $F$ is:
+In equation \eqref{eq:InterpMap}, we have shown the mapping between the value function at any state $x_{i'}\in X$ and $J_{t+1}(x_{j})$ when $x_{j}\not\in X$ is the next state. A similar mapping exists when $x_{j}\in X$, but may or may not be the next state:
+\begin{equation} \label{eq:NextStateMap}
+	J_{t+1}(x_{j})=\sum_{i'}^{MN}e_{i',j}J_{t+1}(x_{i'})
+\end{equation} Here $e_{i',j}=1$ if $x_{j}=x_{i'}$ and if $x_{j}$ is the next state, and $e_{i',j}=0$ otherwise. We can then express the linear combinations in equations \eqref{eq:InterpMap} and \eqref{eq:NextStateMap} in matrix form by a matrix $F$. Let $j$ denote the row index and $i$ the column index of $F$. Then, the structure of $F$ is:
 
-For computing the optimal policy, we can encode the interpolation scheme in a constant matrix $F$ as follows:
 \begin{displaymath}
 F_{j,i}=
 \left\{
 \begin{array}{l}
 1		   \hspace{1cm} \text{if} \hspace{0.2cm}x_{j}=x_{i}, \hspace{0.1cm}x_{j}\in X\\
-q_{l,m,j}\hspace{0.4cm} \text{if} \hspace{0.2cm} [a_{j},b_{j}]^{T}\in\Psi, x_{j}\notin X\\
+q_{l',m',j}\hspace{0.2cm} \text{if} \hspace{0.2cm} a_{l'}\leq a_{j}< a_{l'+1},\\
+\hspace{1.6cm} b_{m'}\leq b_{j}< b_{m'+1}, x_{j}\notin X\\
 0		   \hspace{1cm} \text{otherwise}
 \end{array}
 \right.
-\end{displaymath}%Here $x_{i}\in X$ and so can be expressed as $x_{i}=(a_{l},b_{m},L)$ for any $L\in W$. However, $x_{j}$ may not belong to X, and so is expressed as $x_{j}=(a_{j},b_{j},L)$ for any $L\in W$.
+\end{displaymath} Here $x_{i}\in X$ and so can be expressed as $x_{i}=(a_{l'},b_{m'},L)$ for any $L\in W$. However, $x_{j}$ may not belong to X, and so is expressed as $x_{j}=(a_{j},b_{j},L)$ for any $L\in W$.
 
 We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,j}(u_{p})=P(x_{j}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $x_{j}$ by applying control $u_{p}\in U$. For $p_{i,j}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{j}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
 \begin{equation} \label{eq:TransMtx}
 p_{i,j}(u_{p})=
 \left\{
 \begin{array}{l}
-P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p},w_{k})\\
-0 \hspace{2.0cm} \text{otherwise}
+P(w_{k}|x_{i},u_{p}) \hspace{1.8cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p},w_{k})\\
+0 \hspace{3.5cm} \text{otherwise}
 \end{array}
 \right.
 \end{equation} We express this as a transition probability matrix $P$, whose entries in the $p^{th}$ subset of rows are $p_{i,j}(u_{p})$.  
@@ -177,7 +168,7 @@ We use an equivalent LP formulation of \eqref{eq:DP}. Let $\lambda(x_{i})$ be th
     \max_{\boldsymbol{\lambda_{p}}} \boldsymbol{1}^{T} \boldsymbol{\lambda_{p}}
     \hspace{1em}s.t.\hspace{1em}
     (I-\alpha PF)\boldsymbol{\lambda} \leq \boldsymbol{g}
-\end{equation} Here, $\boldsymbol{\lambda} = [\boldsymbol{\lambda_{p}},\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing P repeated vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components. Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally, vector $\boldsymbol{g}$ contains the stage cost for each state-control pair. This is the final form of the LP exactly equivalent to the DP. 
+\end{equation} Here, $\boldsymbol{\lambda} = [\boldsymbol{\lambda_{p}}\hdots \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing P repeated vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components. Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally, vector $\boldsymbol{g}$ contains the stage cost for each state-control pair. This is the final form of the LP exactly equivalent to the DP. 
 
 \subsection{Optimal Policy}
 The optimal policy my be constructed directly from the solution of the LP in \eqref{eq:LPfinal} \cite{Bertsekas:2007:DPO:1396348}. For $x\in X$ it is given by:
@@ -189,14 +180,14 @@ The optimal policy my be constructed directly from the solution of the LP in \eq
 However, when we apply this policy online, we must again interpolate the optimal control function to states that are off the grid. Again, let $x_{j}=f(x_{i}, u, w)$ be the next state, and let $u^{*}(x_{j})$ be the optimal control to apply in this state. Specifically, define $x_{j}$ to have a demand component of $L_{0}$. Then, for the case where $x_{j}\not\in X$, we also approximate $u^{*}(x_{j})$ using bilinear interpolation as:
 
 \begin{equation}
-    u^{*}(x_{j})=\sum_{l,m}q_{l,m,j}u^{*}(a_{l},b_{m},L_{0})
-\end{equation} Here the state $(a_{l},b_{m},L_{0})\in X$ and $q_{l,m,j}$ is as defined above.
+    u^{*}(x_{j})=\sum_{l',m'}q_{l',m',j}u^{*}(a_{l'},b_{m'},L_{0})
+\end{equation} Here the state $(a_{l'},b_{m'},L_{0})\in X$ and $q_{l',m',j}$ is as defined above.
 
 
-\section{Approximate Solution of LP}
-The major issue which prevents us from solving this LP exactly is that the size of the state space grows exponentially in the number of decision variables \cite{deFarias:2003:LPA:970869.970918}. To deal with the curse of dimensionality, we approximate the value function with basis functions.
+\section{Approximate Solution of DP}
+The major issue which prevents us from solving this DP exactly is that the size of the state space grows exponentially in the number of decision variables \cite{deFarias:2003:LPA:970869.970918}. To deal with the curse of dimensionality, we approximate the value function with basis functions.
 
-Using basis functions, the approximations have the form $\lambda\approx \Phi r$ where $\Phi$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we significantly reduce the size of the linear program. The $q^{th}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we develop a method to generate basis functions for the two-storage problem.
+Using basis functions, the approximations has the form $\lambda\approx \Phi r$ where $\Phi$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we significantly reduce the size of the linear program. The $q^{th}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we develop a method to generate basis functions for the two-storage problem.
 
 We give all basis functions equal weighting as no procedure exists for optimally determining the weights \cite{deFarias:2003:LPA:970869.970918, PatrascuReluEugen2004}. This leads to the following approximation, which is also an LP:
 \begin{equation} \label{eq:ApproxLP}
@@ -220,7 +211,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
 
  \subsection{State Aggregation}
     
-    One may consider the case where multiple states have sufficiently similar optimal values that it is possible to approximate each optimal value by a single value for all the states in that aggregation. We use this to reduce the number of decision variables down to the number of aggregations \cite{5717627}. Note that this is a less computationally expensive alternative to principal component analysis for this multidimensional problem, as \cite{PCA2015} and others have applied to generate the basis functions in the lower-dimensional case.%Specifically, each state in the aggregation has an associated index, so the basis functions are many-to-one functions of the state index $i$.
+    One may consider the case where multiple states have sufficiently similar optimal values that it is possible to approximate each optimal value by a single value for all the states in that aggregation. We use this to reduce the number of decision variables down to the number of aggregations \cite{5717627}. Note that this is a less computationally expensive alternative to principal component analysis for this multidimensional problem, as \cite{PCA2015} and others have applied to generate the basis functions.%Specifically, each state in the aggregation has an associated index, so the basis functions are many-to-one functions of the state index $i$.
     
     Appropriate state aggregations depend on the problem, since the optimal value function varies. %By grouping state indices giving constant values of a function $b(i)$, we can determine the minimum number of aggregations to approximate the value function.
     However, each aggregation must have the same value of $J^{*}_{j}(x_{i}) = \phi_{j}(x_{i})r_{j}$, where $j$ is the index of the aggregation. This implies that the matrix $\Phi$ must have the form:
@@ -238,9 +229,9 @@ We use a combination of two types of basis functions: monomials, and vectors bas
     
 
 \section{Numerical Examples}
-We test our approach on an electric vehicle with a battery and a supercapacitor. In this paper, the optimization problems were solved numerically using Gurobi in CVX for varying sizes of state space, with all other variables kept constant. We used efficiency factors $\alpha^{C}_{1}=0.9$ and $\alpha^{D}_{1}=0.9$ for the battery, $\alpha^{C}_{2}=0.99$ and $\alpha^{D}_{1}=0.95$ for the supercapacitor, as well as a leakage factor of $\beta=0.99$ for both, based on the data in \cite{BattSupercapEff}. We also used a discount factor $\alpha=0.99$, weighting factor $K=2$, and $R'=10$ and $R=13$ for the number of basis functions. Starting from an initial energy state of $E_{1}=E_{1}^{\max}=10$ and $E_{2}=E_{2}^{\max}=5$, the problems were solved to determine the optimal policy offline. The random demand was constrained to $0\leq L \leq (E_{1}+E_{2})$, and the maximum discharge was limited to the total energy --- i.e. $D_{1}^{\max}=E_{1}^{\max}$ and $D_{2}^{\max}=E_{2}^{\max}$. Then, we applied demand sequences where the random load followed a uniform distribution for 10 periods to determine how the battery and supercapacitor behave under different conditions with the optimal policy.
+We test our approach on an electric vehicle with a battery and a supercapacitor. In this paper, the optimization problems were solved numerically using Gurobi in CVX for varying sizes of state space, with all other variables kept constant. We used efficiency factors $\alpha^{C}_{1}=0.9$ and $\alpha^{D}_{1}=0.9$ for the battery, $\alpha^{C}_{2}=0.99$ and $\alpha^{D}_{1}=0.95$ for the supercapacitor, as well as a leakage factor of $\beta=0.99$ for both, based on the data in \cite{BattSupercapEff}. We also used a discount factor $\alpha=0.99$, weighting factor $K=2$, and $R'=10$ and $R=13$ for the number of basis functions. Starting from an initial energy state of $E_{1}=E_{1}^{max}=10$ and $E_{2}=E_{2}^{max}=5$, the problems were solved to determine the optimal policy offline. The random demand was constrained to $0\leq L \leq (E_{1}+E_{2})$, and the maximum discharge was limited to the total energy --- i.e. $D_{1}^{max}=E_{1}^{max}$ and $D_{2}^{max}=E_{2}^{max}$. Then, we applied demand sequences where the random load followed a uniform distribution for 10 periods determine how the battery and supercapacitor should behave under different conditions with the optimal policy.
 
-The approximate LP was first solved offline. We then tested the optimal policy online for three cases of demand: constant, ramp (continuously increasing/decreasing), and fluctuating. Each demand sequence was randomly generated following a uniform distribution, for simplicity. %Importantly, no excess demands were permitted based on the state (total energy stored), such that the conditional probabilities could still change over time as the state evolved.
+The approximate LP was first solved offline. The optimal policy was then tested online with three broad cases of demand: 1) constant, 2) ramp (continuously increasing/decreasing), and 3) fluctuating. Each demand sequence was randomly generated following a uniform distribution, for simplicity. %Importantly, no excess demands were permitted based on the state (total energy stored), such that the conditional probabilities could still change over time as the state evolved.
 
 In the case of a constant or ramp demand, it was determined that the battery will tend to supply the majority of the energy. Figures \ref{fig:ConstDemand} and \ref{fig:RampDemand} illustrate these two cases for one set of initial conditions.
 \begin{figure}[htbp]
@@ -259,14 +250,14 @@ On the other hand, for fluctuating demand, the supercapacitor is used more, as i
 \centerline{\includegraphics[scale=0.25]{EnergyStoredvsFluctuatingLoad(E1=10,E2=5).jpg}}
 \caption{Testing optimal policy online with a fluctuating demand sequence. Test size: $N_{1}=11$, $N_{2}=6$, $M=16$.}
 \label{fig:FluctuatingDemand}
-\end{figure} Clearly, the supercapacitor is now discharged in the middle of the time sequence, at $t=6$. However, this is still not as much as expected. It was observed that by reducing the discharging efficiency of the battery, the supercapacitor is used more often (see Figure \ref{fig:FluctuatingDemand_LowBattEff}).
+\end{figure} Clearly, the supercapacitor is now discharged at the start. However, this is still not as much use as expected. It was observed that by reducing the discharging efficiency of the battery, the supercapacitor is used more often (see Figure \ref{fig:FluctuatingDemand_LowBattEff}).
 \begin{figure}[tbp]
 \centerline{\includegraphics[scale=0.25]{EnergyStoredvsFluctuatingLoad_LowBattEff(E1=10,E2=5).jpg}}
 \caption{Testing optimal policy online with a fluctuating demand sequence. Test size: $N_{1}=11$, $N_{2}=6$, $M=16$. Lower battery efficiency (50\%).}
 \label{fig:FluctuatingDemand_LowBattEff}
-\end{figure} This shows that discharging the battery at the start of the sequence is still preferred because of the higher probability of large initial demands, unless the battery is inefficient.
+\end{figure} Hence, it is concluded that discharging the battery at the start of the sequence is still preferred because of the higher probability of large initial demands, unless the battery is inefficient.
 
-One should also note how the battery is used to charge the supercapacitor, too. This can be seen, for example, in Figure 3 at time 4, where there is no demand but there are still exchanges in the energy between the storage devices. This also confirms that the optimal policy is not myopic, since a trade-off is made between instantaneous transfer loss and satisfying fluctuating demands at a later time by preemptively charging the supercapacitor. Were it not for the benefits of the latter, there would be no reason for such energy exchanges.
+One should also note how the battery is used to charge the supercapacitor, too. This can be seen, for example, in Figure 3 at time 4, where there is no demand but there are still exchanges in the energy between the storage devices. This also confirms that the policy makes forecasts, since a trade-off is made between instantaneous transfer loss and satisfying fluctuating demands at a later time by preemptively charging the supercapacitor. Were it not for the benefits of the latter, there would be no reason for such energy exchanges.
 
 Finally, in addition to testing the optimal policy, we also test the value function approximation. We quantify the approximation error for problems of small size. Figure \ref{fig:ApproxVsIter}, for example, illustrates the trade-off made between the approximation error and the number of iterations in solving the approximate LP, where the latter depends on the number of basis functions. \begin{figure}[tbp]
 \centerline{\includegraphics[scale=0.25]{ApproxErr_vs_NumIter.png}}
@@ -277,7 +268,7 @@ Finally, in addition to testing the optimal policy, we also test the value funct
 
 
 \section{Conclusion}
-In conclusion, this paper has developed and optimized a model for energy transfers from two parallel storage devices to satisfy a random demand. The Markov decision process was formulated as a linear program, and approximated using monomials and state aggregations. The problem was then solved offline and tested online for the numerical example of an EV with hybrid energy storage. The final results confirm that the approximate LP does allow for determining an approximate optimal policy. Further work remains to be done to incorporate regenerative braking into this model.
+In conclusion, this paper has developed and optimized a model for energy transfers from two parallel storage devices to satisfy a random demand. The Markov decision process was formulated a linear program, and approximated using three forms of basis functions: random vectors, monomials, and state aggregates. The problem was then solved offline and tested online for the numerical example of an EV with hybrid energy storage. The final results confirm that the approximate LP does allow for determining an approximate optimal policy. Further work remains to be done to incorporate regenerative braking into this model.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references.bib}
