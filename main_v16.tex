@@ -86,7 +86,7 @@ subject to
 & E_{1}(t+1)=\beta_{1}E_{1}(t)-\frac{1}{\alpha_{1}^{D}}D_{1}(t)\\
 & E_{2}(t+1)=\beta_{2}E_{2}(t)+\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)
 \end{flalign*}
-Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1},D_{2}]^{T}$. The range of the discharged energies for each device $h$, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $rho_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $rho=rho_{1}rho_{2}$.
+Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1},D_{2}]^{T}$. The range of the discharged energies for each device $h$, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $P_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $P=P_{1}P_{2}$.
 
 The optimal value function \eqref{eq:initCostFnc} may be expressed in the general form:
 \begin{equation} \label{eq:FHDP}
@@ -105,46 +105,43 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
                 & E_{2}(t+1)=\beta_{2}E_{2}(t)+\left(\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)\right)\Biggr\}
 \end{flalign*} where $C_{2}=D_{1}(t)+D_{2}(t)-L(t)$, using the energy balance constraint.
 
-In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1)$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
+In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1))$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}$, where $L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,P\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
-
-Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in {1,...,(MN)^{2}P}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
+Let $X$ be the set of values the discretized state, $x(t)$, may occupy. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,2,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,P\}$. By the above definition, $X=Y\times W$, and $X$ is indexed by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, which is to say that --- for example --- $x_{i}$ is the $i^{th}$ element in set $X$. Then, let $x_{i}$ be the state at time $t$, and $x_{j}$ be any state in $X$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
 \begin{equation} \label{eq:InterpMap}
 	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
 \end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
 
-First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{th}$ value of energy $E_{1}$, and $b_{m}$ be the $m^{th}$ value of energy $E_{2}$. Also let $x_{j}=(a_{j},b_{j},L_{0})$, where $L_{0}\in W$ is the demand in state $x_{i}$. %Let $X_{h}$ be the set of energy levels for device $h$, . <-----------------------------------------------------------------------------
-Then, the interpolation weights are $q_{l,m,j}$, where:
-\begin{displaymath}q_{l,m,j}=
-\left\{
-\begin{array}{l}
-\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{1.6cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1},\\ \times \Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.3cm}b_{m}\leq b_{j}< b_{m+1}\\\\
-0		   \hspace{4.8cm} \text{otherwise}
-\end{array}
-\right.
-\end{displaymath}
+First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{th}$ value of energy $E_{1}$, and $b_{m}$ be the $m^{th}$ value of energy $E_{2}$. As well, let $\Psi=\{\psi\in\mathbb{R}^{2}\mid [a_{l},b_{m}]^{T}\leq\psi<[a_{l+1},b_{m+1}]^{T}\}$. Then, the interpolation weights are $q_{l,m,j}$, where:
 %\begin{displaymath}q_{l,m,j}=
 %\left\{
 %\begin{array}{l}
-%\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big)\hspace{0.1cm} \text{if} \hspace{0.1cm} [a_{j},b_{j}]^{T}\in\Psi\\
-%0		   \hspace{4.4cm} \text{otherwise}
+%\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{1.6cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1},\\ \times \Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.3cm}b_{m}\leq b_{j}< b_{m+1}\\\\
+%0		   \hspace{4.8cm} \text{otherwise}
 %\end{array}
 %\right.
-%\end{displaymath} Here, $a_{j}$ and $b_{j}$ are coordinates of the point $x_{j}\not\in X$.
+%\end{displaymath}
+\begin{displaymath}q_{l,m,j}=
+\left\{
+\begin{array}{l}
+\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big)\hspace{0.1cm} \text{if} \hspace{0.1cm} [a_{j},b_{j}]^{T}\in\Psi\\
+0		   \hspace{4.4cm} \text{otherwise}
+\end{array}
+\right.
+\end{displaymath} Here, $a_{j}$ and $b_{j}$ are components of the state $x_{j}\not\in X$.
 
 %In equation \eqref{eq:InterpMap}, we have shown the mapping between the value function at any state $x_{i'}\in X$ and $J_{t+1}(x_{j})$ when $x_{j}\not\in X$ is the next state. A similar mapping exists when $x_{j}\in X$, but may or may not be the next state:
 %\begin{equation} \label{eq:NextStateMap}
 	%J_{t+1}(x_{j})=\sum_{i'}^{MN}e_{i',j}J_{t+1}(x_{i'})
 %\end{equation} Here $e_{i',j}=1$ if $x_{j}=x_{i'}$ and if $x_{j}$ is the next state, and $e_{i',j}=0$ otherwise. We can then express the linear combinations in equations \eqref{eq:InterpMap} and \eqref{eq:NextStateMap} in matrix form by a matrix $F$. Let $j$ denote the row index and $i$ the column index of $F$. Then, the structure of $F$ is:
 
-To compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for control $u_{p}$ as follows:
+For computing the optimal policy, we can encode the interpolation scheme in a constant matrix $F$ as follows:
 \begin{displaymath}
-F_{j,i,p}=
+F_{j,i}=
 \left\{
 \begin{array}{l}
-1		   \hspace{1cm} \text{if} \hspace{0.2cm}x_{j}=x_{i}\\
-q_{l,m,j}\hspace{0.4cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1}, b_{m}\leq b_{j}< b_{m+1}\\
+1		   \hspace{1cm} \text{if} \hspace{0.2cm}x_{j}=x_{i}, \hspace{0.1cm}x_{j}\in X\\
+q_{l,m,j}\hspace{0.4cm} \text{if} \hspace{0.2cm} [a_{j},b_{j}]^{T}\in\Psi, x_{j}\notin X\\
 0		   \hspace{1cm} \text{otherwise}
 \end{array}
 \right.
@@ -159,7 +156,7 @@ P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p}
 0 \hspace{2.0cm} \text{otherwise}
 \end{array}
 \right.
-\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries in the $p^{th}$ subset of rows are $p_{i,j}(u_{p})$.  
+\end{equation} We express this as a transition probability matrix $P$, whose entries in the $p^{th}$ subset of rows are $p_{i,j}(u_{p})$.  
 
 
 
@@ -168,21 +165,19 @@ P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p}
 %\subsection{Infinite Horizon DP}
 The length of each time period is very small relative to the total driving time. For example, each period might represent a second. If the total driving time is an hour, this means 3600 periods. This motivates the use of an infinite horizon approximation.
 
-The infinite horizon DP is:
+With a modification to the finite horizon problem, the infinite horizon problem is:
 \begin{equation} \label{eq:DP}
 J(x)=\min_{u} g(x,u) + \alpha\mathop{\E}_{w} \{J(f(x,u,w))\}
 \end{equation} subject to $(x,u)\in\Omega$. Here $\alpha$ is a real-valued discount factor such that $0<\alpha<1$. Using this approximation, in the following sections we formulate an LP equivalent to this DP and use its solution to obtain the optimal policy. As a reminder, in the context of the hybrid storage problem, $x=(E_{1},E_{2},L)$ and $u=(D_{1},D_{2})$.
 
 
 \subsection{Linear Programming Formulation}
-We use an equivalent LP formulation of \eqref{eq:DP}. Let $\lambda\in\mathbb{R}^{MN}$ be a vector of the value function at each value in $X$, and let $g$ be a vector of the stage cost for each state-control pair. Then, the problem can be expressed as:
+We use an equivalent LP formulation of \eqref{eq:DP}. Let $\lambda(x_{i})$ be the value function at state $x_{i}$. Then, the problem can be expressed most succinctly in matrix form as:
 \begin{equation} \label{eq:LPfinal}
-    \max_{\lambda} 1^{T} \lambda
+    \max_{\boldsymbol{\lambda_{p}}} \boldsymbol{1}^{T} \boldsymbol{\lambda_{p}}
     \hspace{1em}s.t.\hspace{1em}
-    (\iota-\alpha PF)\lambda \leq g
-\end{equation} Here, $\iota=[I,...,I]^{T}$ is a matrix consisting of $\rho$ copies of the identity matrix, $P$ is a block diagonal matrix containing all the matrices $P_{p}$ along its diagonal, and $F=[(F_{1})^{T},...,(F_{\rho})^{T}]^{T}$ is a matrix consisting of each matrix $F_{p}$ structured as defined. %Here, $\Lambda = [\lambda,\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing $\rho$ copies of vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components.
-%Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally,
-This is the final form of the LP exactly equivalent to the DP. 
+    (I-\alpha PF)\boldsymbol{\lambda} \leq \boldsymbol{g}
+\end{equation} Here, $\boldsymbol{\lambda} = [\boldsymbol{\lambda_{p}},\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing P repeated vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components. Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally, vector $\boldsymbol{g}$ contains the stage cost for each state-control pair. This is the final form of the LP exactly equivalent to the DP. 
 
 \subsection{Optimal Policy}
 The optimal policy my be constructed directly from the solution of the LP in \eqref{eq:LPfinal} \cite{Bertsekas:2007:DPO:1396348}. For $x\in X$ it is given by:
@@ -191,17 +186,17 @@ The optimal policy my be constructed directly from the solution of the LP in \eq
     u^{*}(x)=\argmin_{u} g(x,u)+\alpha \sum_{w} P(w|x,u)\lambda(f(x,u,w))
 \end{equation}
 
-We must use interpolation to implement this policy. Let $x_{j}=f(x_{i}, u, w)$ be the next state, and let $u'(x_{j})$ be the interpolated suboptimal control to apply in this state. Specifically, define $x_{j}=(a_{j},b_{j},L_{0})$ where $L_{0}\in W$ is the demand in state $x_{i}$. Then, for the case where $x_{j}\not\in X$, we also approximate $u^{*}(x_{j})$ using bilinear interpolation as:
+However, when we apply this policy online, we must again interpolate the optimal control function to states that are off the grid. Again, let $x_{j}=f(x_{i}, u, w)$ be the next state, and let $u^{*}(x_{j})$ be the optimal control to apply in this state. Specifically, define $x_{j}$ to have a demand component of $L_{0}$. Then, for the case where $x_{j}\not\in X$, we also approximate $u^{*}(x_{j})$ using bilinear interpolation as:
 
 \begin{equation}
-    u'(x_{j})=\sum_{l,m}q_{l,m,j}u^{*}(a_{l},b_{m},L_{0})
+    u^{*}(x_{j})=\sum_{l,m}q_{l,m,j}u^{*}(a_{l},b_{m},L_{0})
 \end{equation} Here the state $(a_{l},b_{m},L_{0})\in X$ and $q_{l,m,j}$ is as defined above.
 
 
 \section{Approximate Solution of LP}
-Unfortunately, the state space is too large to use a fine discretization. To improve tractability, we approximate the value function with basis functions using the methodology of \cite{deFarias:2003:LPA:970869.970918}.
+The major issue which prevents us from solving this LP exactly is that the size of the state space grows exponentially in the number of decision variables \cite{deFarias:2003:LPA:970869.970918}. To deal with the curse of dimensionality, we approximate the value function with basis functions.
 
-The approximate value function has the form $\Phi r$, where $\Phi \in \mathbb{R}^{MN\times R}$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we reduce the size of the linear program. The $q^{th}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we discuss methods to generate basis functions for the two-storage problem.
+Using basis functions, the approximations have the form $\lambda\approx \Phi r$ where $\Phi$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we significantly reduce the size of the linear program. The $q^{th}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we develop a method to generate basis functions for the two-storage problem.
 
 We give all basis functions equal weighting as no procedure exists for optimally determining the weights \cite{deFarias:2003:LPA:970869.970918, PatrascuReluEugen2004}. This leads to the following approximation, which is also an LP:
 \begin{equation} \label{eq:ApproxLP}
@@ -225,11 +220,10 @@ We use a combination of two types of basis functions: monomials, and vectors bas
 
  \subsection{State Aggregation}
     
-    %One may consider the case where multiple states have sufficiently similar optimal values that it is possible to approximate each optimal value by a single value for all the states in that aggregation.
-    We use the heuristic of state aggregation to reduce the number of decision variables down to the number of aggregations of states \cite{5717627}. This is a less computationally expensive alternative to principal component analysis for this multidimensional problem, as \cite{PCA2015} and others have applied to generate the basis functions in the lower-dimensional case.%Specifically, each state in the aggregation has an associated index, so the basis functions are many-to-one functions of the state index $i$.
+    One may consider the case where multiple states have sufficiently similar optimal values that it is possible to approximate each optimal value by a single value for all the states in that aggregation. We use this to reduce the number of decision variables down to the number of aggregations \cite{5717627}. Note that this is a less computationally expensive alternative to principal component analysis for this multidimensional problem, as \cite{PCA2015} and others have applied to generate the basis functions in the lower-dimensional case.%Specifically, each state in the aggregation has an associated index, so the basis functions are many-to-one functions of the state index $i$.
     
     Appropriate state aggregations depend on the problem, since the optimal value function varies. %By grouping state indices giving constant values of a function $b(i)$, we can determine the minimum number of aggregations to approximate the value function.
-    However, each aggregation is defined to have approximate the same value of $\phi_{j}(x_{i})r_{j}$ for all states $x_{i}$ in that aggregation, where $j$ is the index of the aggregation. This implies that the matrix $\Phi$ must have the form:
+    However, each aggregation must have the same value of $J^{*}_{j}(x_{i}) = \phi_{j}(x_{i})r_{j}$, where $j$ is the index of the aggregation. This implies that the matrix $\Phi$ must have the form:
     
     \begin{displaymath}
         \Phi_{i,j}=\left\{
@@ -240,7 +234,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
             \right.
     \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(i)r_{j}\}=\{i|e_{j} = b(i)\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{th}$ aggregation (basis function).
 	
-	Note that in order to determine one possible function $b(x_{i})$ for the given model, we run value iteration an arbitrary number of times to approximate $J^{*}_{j}(x_{i})$. This allows us to identify possible state aggregations.
+	Note that in order to determine one possible function $b(x_{i})$ for the given model, we run value iteration an arbitrary number of times to approximate $J^{*}_{j}(x_{i})$. This allows us to identify the state aggregations.
     
 
 \section{Numerical Examples}
