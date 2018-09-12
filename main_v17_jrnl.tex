@@ -109,7 +109,7 @@ In this model, $L(t)$ is a random quantity which is observed at time $t$ before 
 
 Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
 
-Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in \{1,...,(MN)^{2}P\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
+Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
 \begin{equation} \label{eq:InterpMap}
 	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
 \end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
@@ -179,8 +179,8 @@ We use an equivalent LP formulation of \eqref{eq:DP}. Let $\lambda\in\mathbb{R}^
 \begin{equation} \label{eq:LPfinal}
     \max_{\lambda} 1^{T} \lambda
     \hspace{1em}s.t.\hspace{1em}
-    (\iota-\alpha PF)\lambda \leq g
-\end{equation} Here, $\iota=[I,...,I]^{T}$ is a matrix consisting of $\rho$ copies of the identity matrix, $P$ is a block diagonal matrix containing all the matrices $P_{p}$ along its diagonal, and $F=[(F_{1})^{T},...,(F_{\rho})^{T}]^{T}$ is a matrix consisting of each matrix $F_{p}$ structured as defined. %Here, $\Lambda = [\lambda,\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing $\rho$ copies of vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components.
+    (\iota-\alpha \overline{P})\lambda \leq g
+\end{equation} Here, $\iota=[I,...,I]^{T}$ is a matrix consisting of $\rho$ copies of the identity matrix and $\overline{P}=[(P_{1}F_{1})^{T},...,(P_{\rho}F_{\rho})^{T}]^{T}$ is a matrix consisting of matrices $P_{p}F_{p}$, structured as defined. %Here, $\Lambda = [\lambda,\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing $\rho$ copies of vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components.
 %Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally,
 This is the final form of the LP exactly equivalent to the DP. 
 

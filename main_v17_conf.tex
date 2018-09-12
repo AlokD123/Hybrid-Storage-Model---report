@@ -109,7 +109,7 @@ In this model, $L(t)$ is a random quantity which is observed at time $t$ before 
 
 Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
 
-We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings, as described in \cite[p.~319]{MultiLinInterp} and elsewhere. To  compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for each control $u_{p}$. This is to say that if we let $x_{i}$ be the state at time $t$ and $x_{j}=f(x_{i},u_{p},w_{k})$ be the state at time $t+1$, the entry $(i,j)$ of $F_{p}$ contains the weight of $J_{t+1}(x_{i})$ that contributes to $J_{t+1}(x_{j})$.
+We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings, as described in \cite[p.~319]{MultiLinInterp} and elsewhere. To  compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for each control $u_{p}$. This is to say that if we let $x_{i}$ be any state in $X$ and $x_{j}=f(x_{i},u_{p},w_{k})$ be the state at time $t+1$, the entry $(i,j)$ of $F_{p}$ contains the weight of $J_{t+1}(x_{i})$ that contributes to $J_{t+1}(x_{j})$.
 
 We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,j}(u_{p})=P(x_{j}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $x_{j}$ by applying control $u_{p}\in U$. For $p_{i,j}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{j}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
 \begin{equation} \label{eq:TransMtx}
@@ -141,8 +141,9 @@ We use an equivalent LP formulation of \eqref{eq:DP}. Let $\lambda\in\mathbb{R}^
 \begin{equation} \label{eq:LPfinal}
     \max_{\lambda} 1^{T} \lambda
     \hspace{1em}s.t.\hspace{1em}
-    (\iota-\alpha PF)\lambda \leq g
-\end{equation} Here, $\iota=[I,...,I]^{T}$ is a matrix consisting of $\rho$ copies of the identity matrix, $P=diag(P_{1},...,P_{\rho})$ is a block diagonal matrix containing all the matrices $P_{p}$ along its diagonal, and $F=[(F_{1})^{T},...,(F_{\rho})^{T}]^{T}$ is a matrix consisting of each matrix $F_{p}$ structured as defined. %Here, $\Lambda = [\lambda,\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing $\rho$ copies of vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components.
+    (\iota-\alpha \overline{P})\lambda \leq g
+\end{equation} Here, $\iota=[I,...,I]^{T}$ is a matrix consisting of $\rho$ copies of the identity matrix and $\overline{P}=[(P_{1}F_{1})^{T},...,(P_{\rho}F_{\rho})^{T}]^{T}$ is a matrix consisting of matrices $P_{p}F_{p}$, structured as defined. %$P=diag(P_{1},...,P_{\rho})$ is a block diagonal matrix containing all the matrices $P_{p}$ along its diagonal
+%Here, $\Lambda = [\lambda,\hdots, \boldsymbol{\lambda_{p}}]^{T}$ is a vector containing $\rho$ copies of vectors $\boldsymbol{\lambda_{p}}$. Each vector $\boldsymbol{\lambda_{p}}$ contains the current state values, $\lambda(x_{i})$, as its components.
 %Likewise, the vector $F\boldsymbol{\lambda}$ contains P repeated vectors each containing the costs for next states $x_{j}$. And finally,
 This is the final form of the LP exactly equivalent to the DP. 
 
@@ -169,7 +170,7 @@ We give all basis functions equal weighting as no procedure exists for optimally
 \begin{equation} \label{eq:ApproxLP}
     \max_{r} 1^{T} \Phi r
     \hspace{1em}s.t.\hspace{1em}
-    (\iota-\alpha PF)\Phi r \leq \boldsymbol{g}
+    (\iota-\alpha \overline{P})\Phi r \leq \boldsymbol{g}
 \end{equation}
 
 We use a combination of two types of basis functions: monomials, and vectors based on heuristic state aggregation. We describe these in the following two subsections.
@@ -234,7 +235,7 @@ On the other hand, for highly fluctuating demand, the supercapacitor is used mor
 \label{fig:FluctuatingDemand_LowBattEff}
 \end{figure} This shows that discharging the battery at the start of the sequence is still preferred because of the higher probability of large initial demands, unless the battery is inefficient.
 
-One should also note how the battery is used to charge the supercapacitor, too. This can be seen, for example, in Figure 3 at time 4, where there is no demand but there are still exchanges in the energy between the storage devices. This also confirms that the optimal policy is not myopic, since a trade-off is made between instantaneous transfer loss and satisfying fluctuating demands at a later time by preemptively charging the supercapacitor. Were it not for the benefits of the latter, there would be no reason for such energy exchanges.
+One should also note how the battery is used to charge the supercapacitor, too. This can be seen, for example, in Figure 3 at time $t=4$, where there is no demand but there are still exchanges in the energy between the storage devices. This also confirms that the optimal policy is not myopic, since a trade-off is made between instantaneous transfer loss and satisfying fluctuating demands at a later time by preemptively charging the supercapacitor. Were it not for the benefits of the latter, there would be no reason for such energy exchanges.
 
 Finally, in addition to testing the optimal policy, we also test the value function approximation. We quantify the approximation error for problems of small size. Figure \ref{fig:ApproxVsIter}, for example, illustrates the trade-off made between the approximation error and the number of iterations in solving the approximate LP, where the latter depends on the number of basis functions. \begin{figure}[tbp]
 \centerline{\includegraphics[scale=0.25]{ApproxErr_vs_NumIter.png}}
