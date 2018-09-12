@@ -70,8 +70,8 @@ There are two relevant costs in this model. The first is the loss of energy due 
 \bigg(\frac{1}{\alpha_{1}^{D}}-1\bigg)D_{1}(t)+(1-\alpha_{2}^{C})C_{2}(t)+\bigg(\frac{1}{\alpha_{2}^{D}}-1\bigg)D_{2}(t)
 \end{displaymath} The other cost is that for the discharge rate for the battery, simply given by $K(D_{1}(t))^{2}$. Here $K$ is a weighting for this cost relative to the cost of energy loss. This cost penalizes larger power transfers \cite{bambang2014energy}, which cause greater battery degradation. We define the stage cost of the optimization problem to be:
 \begin{align*}
-    g(E_{1}(t),E_{2}(t),L(t),D_{1}(t),D_{2}(t))=\delta^{T}\chi
-\end{align*} where $\delta=\left[\big(\frac{1}{\alpha_{1}^{D}}-1\big),(1-\alpha_{2}^{C}),\big(\frac{1}{\alpha_{2}^{D}}-1\big),K\right]^{T}$ and $\chi=\left[D_{1}(t),C_{2}(t),D_{2}(t),(D_{1}(t))^{2}\right]^{T}$.
+    g(x(t),u(t),w(t))=&\bigg(\frac{1}{\alpha_{1}^{D}}-1\bigg)D_{1}(t) +(1-\alpha_{2}^{C})C_{2}(t)\\& +\bigg(\frac{1}{\alpha_{2}^{D}}-1\bigg)D_{2}(t) +K(D_{1}(t))^{2}
+\end{align*}
 
 We collect this objective and the above constraints in the below convex optimization problem:
 \begin{multline} \label{eq:initCostFnc}
@@ -86,7 +86,7 @@ subject to
 & E_{1}(t+1)=\beta_{1}E_{1}(t)-\frac{1}{\alpha_{1}^{D}}D_{1}(t)\\
 & E_{2}(t+1)=\beta_{2}E_{2}(t)+\alpha_{2}^{C}C_{2}(t)-\frac{1}{\alpha_{2}^{D}}D_{2}(t)
 \end{flalign*}
-Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1},D_{2}]^{T}$. The range of the discharged energies for each device $h$, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $rho_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $rho=rho_{1}rho_{2}$.
+Note that the energy balance equality constraint can be substituted into the objective and the charging inequality constraints, which reduces the decision vector to $u=[D_{1},D_{2}]^{T}$. The range of the discharged energies for each device $h$, $0\leq D_{h}(t)\leq D_{h}^{\max}$, is discretized into $\rho_{h}$ levels, which means that the number of possible solutions, $u(t)$, at each stage of the DP is $\rho=\rho_{1}\rho_{2}$.
 
 The optimal value function \eqref{eq:initCostFnc} may be expressed in the general form:
 \begin{equation} \label{eq:FHDP}
@@ -107,9 +107,9 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
 
 In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1)$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,P\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
+Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
 
-Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in {1,...,(MN)^{2}P}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
+Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in \{1,...,(MN)^{2}P\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
 \begin{equation} \label{eq:InterpMap}
 	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
 \end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
@@ -159,7 +159,7 @@ P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p}
 0 \hspace{2.0cm} \text{otherwise}
 \end{array}
 \right.
-\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries in the $p^{th}$ subset of rows are $p_{i,j}(u_{p})$.  
+\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries are $p_{i,j}(u_{p})$.  
 
 
 
@@ -205,9 +205,9 @@ The approximate value function has the form $\Phi r$, where $\Phi \in \mathbb{R}
 
 We give all basis functions equal weighting as no procedure exists for optimally determining the weights \cite{deFarias:2003:LPA:970869.970918, PatrascuReluEugen2004}. This leads to the following approximation, which is also an LP:
 \begin{equation} \label{eq:ApproxLP}
-    \max_{\boldsymbol{r}} \boldsymbol{1}^{T} \Phi r
+    \max_{r} 1^{T} \Phi r
     \hspace{1em}s.t.\hspace{1em}
-    (I-\alpha PF)\Phi r \leq \boldsymbol{g}
+    (\iota-\alpha PF)\Phi r \leq \boldsymbol{g}
 \end{equation}
 
 We use a combination of two types of basis functions: monomials, and vectors based on heuristic state aggregation. We describe these in the following two subsections.
@@ -258,7 +258,7 @@ In the case of a constant or ramp demand, it was determined that the battery wil
 \centerline{\includegraphics[scale=0.25]{EnergyStoredvsload_RampLoad(E1_max=10,E2_max=5).jpg}}
 \caption{Testing optimal policy online with a ramp demand sequence. Test size: $N_{1}=11$, $N_{2}=6$, $M=16$.}
 \label{fig:RampDemand}
-\end{figure} This result is expected because there is low cost for steady use of the battery (constant demand) or for limited cycling (ramp demand).
+\end{figure} This result is expected because there is relative cost for use of the battery under low demand or demand with limited fluctuation.
 
 On the other hand, for fluctuating demand, the supercapacitor is used more, as illustrated in Figure \ref{fig:FluctuatingDemand}.
 \begin{figure}[htbp]
@@ -278,7 +278,7 @@ Finally, in addition to testing the optimal policy, we also test the value funct
 \centerline{\includegraphics[scale=0.25]{ApproxErr_vs_NumIter.png}}
 \caption{Variation in approximation error and solution time with number of basis functions added. Test size: $N_{1}=6$, $N_{2}=5$, $M=16$.}
 \label{fig:ApproxVsIter}
-\end{figure} This shows that the approximation error can indeed be made arbitarily small by adding more basis functions.
+\end{figure} This shows that the approximation error can indeed be made arbitarily small by adding more basis functions. %We may choose 
 
 
 
