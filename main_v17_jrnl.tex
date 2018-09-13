@@ -107,23 +107,34 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
 
 In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1)$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
+Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define four sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; $X_{1}$ as the set of discrete energy levels $E_{1}$, indexed by $l \in\{1,...,N_{1}\}$; $X_{2}$ as the set of discrete energy levels $E_{2}$, indexed by $m \in\{1,...,N_{2}\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=X_{1}\times X_{2}\times W$. We index $X$ by the linear index $i\in\{1,...,NM\}$, or equivalently by the triplet of indices $(l,m,k)$. We use subscripts to index the elements in each set, e.g., $x_{i}$ is the $i^{\text{th}}$ element in set $X$.
 
-Let $x_{i}$ be the state at time $t$ and $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$. Let $x_{j}$ be the $j^{th}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state, we apply interpolation according to \cite[p.~319]{MultiLinInterp} when $x_{j}\not\in X$:
+Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $x_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state and $x_{j}\not\in X$, we apply interpolation according to \cite[p.~319]{MultiLinInterp} to determine the value function at $x_{j}$:
 \begin{equation} \label{eq:InterpMap}
 	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
 \end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
 
-First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{th}$ value of energy $E_{1}$, and $b_{m}$ be the $m^{th}$ value of energy $E_{2}$. Also let $x_{j}=(a_{j},b_{j},L_{0})$, where $L_{0}\in W$ is the demand in state $x_{i}$. %Let $X_{h}$ be the set of energy levels for device $h$, . <-----------------------------------------------------------------------------
-Then, the interpolation weights are $q_{l,m,j}$, where:
-\begin{displaymath}q_{l,m,j}=
+First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{\text{th}}$ value of energy $E_{1}$, $b_{m}$ be the $m^{\text{th}}$ value of energy $E_{2}$, and $L_{k}$ be the $k^{\text{th}}$ demand in the set $W$. Then, we represent $x_{i}=x_{l,m,k}$ in terms of its coordinates as $[a_{l},b_{m},L_{k}]^{T}$. Note that $x_{i}$ and $x_{l,m,k}$ refer to the same state because we use the linear index $i$ for the set $X$, which is equivalent to standard indexing with $(l,m,k)$. Similarly to $x_{i}$, we represent $x_{j}$ as $[a,b,L']^{T}$. Here $a\in\mathbb{R}$ and $b\in\mathbb{R}$ are, respectively, the energies $E_{1}$ and $E_{2}$ associated with the $j^{\text{th}}$ state, and $L'$ is a demand in the set $W$.
+
+Then, the interpolation weights are $q_{i',j}=q_{l,m,k,j}$, where:
+%\begin{displaymath}q_{l,m,j}=
+%\left\{
+%\begin{array}{l}
+%\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big)\\ \text{if} \hspace{0.1cm} a_{l}\leq a_{j}<a_{l+1},b_{m}\leq b<b_{m+1}, L_{k}=L_{n}\\\\
+%0		   \hspace{4.8cm} \text{otherwise}
+%\end{array}
+%\right.
+%\end{displaymath}
+
+\begin{displaymath}q_{l,m,k,j}=
 \left\{
 \begin{array}{l}
-\Big(1-\frac{a_{j}-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{1.6cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1},\\ \times \Big(1-\frac{b_{j}-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.3cm}b_{m}\leq b_{j}< b_{m+1}\\\\
-0		   \hspace{4.8cm} \text{otherwise}
+\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{0.7cm} \text{if} \hspace{0.1cm} a_{l}\leq a< a_{l+1},L'=L_{k},\\ \times \Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.8cm}b_{m}\leq b< b_{m+1}\\\\
+0		   \hspace{5.2cm} \text{otherwise}
 \end{array}
 \right.
-\end{displaymath}
+\end{displaymath} Note that $q_{i',j}$ and $q_{l,m,k,j}$ refer to the same quantity for the same reasons that $x_{i}$ is the same quantity as $x_{l,m,k}$.
+
 %\begin{displaymath}q_{l,m,j}=
 %\left\{
 %\begin{array}{l}
@@ -133,18 +144,13 @@ Then, the interpolation weights are $q_{l,m,j}$, where:
 %\right.
 %\end{displaymath} Here, $a_{j}$ and $b_{j}$ are coordinates of the point $x_{j}\not\in X$.
 
-%In equation \eqref{eq:InterpMap}, we have shown the mapping between the value function at any state $x_{i'}\in X$ and $J_{t+1}(x_{j})$ when $x_{j}\not\in X$ is the next state. A similar mapping exists when $x_{j}\in X$, but may or may not be the next state:
-%\begin{equation} \label{eq:NextStateMap}
-	%J_{t+1}(x_{j})=\sum_{i'}^{MN}e_{i',j}J_{t+1}(x_{i'})
-%\end{equation} Here $e_{i',j}=1$ if $x_{j}=x_{i'}$ and if $x_{j}$ is the next state, and $e_{i',j}=0$ otherwise. We can then express the linear combinations in equations \eqref{eq:InterpMap} and \eqref{eq:NextStateMap} in matrix form by a matrix $F$. Let $j$ denote the row index and $i$ the column index of $F$. Then, the structure of $F$ is:
-
 To compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for control $u_{p}$ as follows:
 \begin{displaymath}
 F_{j,i,p}=
 \left\{
 \begin{array}{l}
 1		   \hspace{1cm} \text{if} \hspace{0.2cm}x_{j}=x_{i}\\
-q_{l,m,j}\hspace{0.4cm} \text{if} \hspace{0.1cm} a_{l}\leq a_{j}< a_{l+1}, b_{m}\leq b_{j}< b_{m+1}\\
+q_{l,m,k,j}\hspace{0.1cm} \text{if} \hspace{0.1cm} a_{l}\leq a<a_{l+1}, b_{m}\leq b<b_{m+1},L'=L_{k}\\
 0		   \hspace{1cm} \text{otherwise}
 \end{array}
 \right.
@@ -170,7 +176,7 @@ The length of each time period is very small relative to the total driving time.
 
 The infinite horizon DP is:
 \begin{equation} \label{eq:DP}
-J(x)=\min_{u} g(x,u) + \alpha\mathop{\E}_{w} \{J(f(x,u,w))\}
+J(x)=\min_{u} g(x,u) + \alpha\mathop{\E}_{w} [J(f(x,u,w))]
 \end{equation} subject to $(x,u)\in\Omega$. Here $\alpha$ is a real-valued discount factor such that $0<\alpha<1$. Using this approximation, in the following sections we formulate an LP equivalent to this DP and use its solution to obtain the optimal policy. As a reminder, in the context of the hybrid storage problem, $x=(E_{1},E_{2},L)$ and $u=(D_{1},D_{2})$.
 
 
@@ -191,17 +197,17 @@ The optimal policy my be constructed directly from the solution of the LP in \eq
     u^{*}(x)=\argmin_{u} g(x,u)+\alpha \sum_{w} P(w|x,u)\lambda(f(x,u,w))
 \end{equation}
 
-We must use interpolation to implement this policy. Let $x_{j}=f(x_{i}, u, w)$ be the next state, and let $u'(x_{j})$ be the interpolated suboptimal control to apply in this state. Specifically, define $x_{j}=(a_{j},b_{j},L_{0})$ where $L_{0}\in W$ is the demand in state $x_{i}$. Then, for the case where $x_{j}\not\in X$, we also approximate $u^{*}(x_{j})$ using bilinear interpolation as:
+We must use interpolation to implement this policy when $x\not\in X$. Let $x_{j}=f(x_{i}, u, w)\not\in X$ be the next state, and let $u'(x_{j})$ be the interpolated suboptimal control to apply in this state. We represent state $x_{j}$ as $[a,b,L']^{T}$ and state $x_{l,m,k}\in X$ as $[a_{l},b_{m},L_{k}]$, just as in Section II. Then, we can approximate the optimal control in state $x_{i}$ using bilinear interpolation as:
 
 \begin{equation}
-    u'(x_{j})=\sum_{l,m}q_{l,m,j}u^{*}(a_{l},b_{m},L_{0})
-\end{equation} Here the state $(a_{l},b_{m},L_{0})\in X$ and $q_{l,m,j}$ is as defined above.
+    u'(x_{j})=\sum_{l,m,k}q_{l,m,k,j}u^{*}(x_{l,m,k})
+\end{equation} %Here $q_{l,m,j}$ is as defined above.
 
 
 \section{Approximate Solution of LP}
 Unfortunately, the state space is too large to use a fine discretization. To improve tractability, we approximate the value function with basis functions using the methodology of \cite{deFarias:2003:LPA:970869.970918}.
 
-The approximate value function has the form $\Phi r$, where $\Phi \in \mathbb{R}^{MN\times R}$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we reduce the size of the linear program. The $q^{th}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we discuss methods to generate basis functions for the two-storage problem.
+The approximate value function has the form $\Phi r$, where $\Phi \in \mathbb{R}^{MN\times R}$ is termed the design matrix and $r\in \mathbb{R}^R$ is a vector of weights. By choosing $R$ to be lower than the number of entries in the value function, we reduce the size of the linear program. The $q^{\text{th}}$ column vector of $\Phi$ is a basis function denoted by $\phi_{q}$. In this section, we discuss methods to generate basis functions for the two-storage problem.
 
 We give all basis functions equal weighting as no procedure exists for optimally determining the weights \cite{deFarias:2003:LPA:970869.970918, PatrascuReluEugen2004}. This leads to the following approximation, which is also an LP:
 \begin{equation} \label{eq:ApproxLP}
@@ -238,7 +244,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
             0 \hspace{0.2cm} \text{if} \hspace{0.2cm} i\not\in H_{j}
             \end{array}
             \right.
-    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(i)r_{j}\}=\{i|e_{j} = b(i)\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{th}$ aggregation (basis function).
+    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(i)r_{j}\}=\{i|e_{j} = b(i)\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{\text{th}}$ aggregation (basis function).
 	
 	Note that in order to determine one possible function $b(x_{i})$ for the given model, we run value iteration an arbitrary number of times to approximate $J^{*}_{j}(x_{i})$. This allows us to identify possible state aggregations.
     

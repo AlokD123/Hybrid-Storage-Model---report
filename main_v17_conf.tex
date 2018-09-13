@@ -109,19 +109,21 @@ In this model, $L(t)$ is a random quantity which is observed at time $t$ before 
 
 Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
 
-We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings, as described in \cite[p.~319]{MultiLinInterp} and elsewhere. To  compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for each control $u_{p}$. This is to say that if we let $x_{i}$ be any state in $X$ and $x_{j}=f(x_{i},u_{p},w_{k})$ be the state at time $t+1$, the entry $(i,j)$ of $F_{p}$ contains the weight of $J_{t+1}(x_{i})$ that contributes to $J_{t+1}(x_{j})$.
+Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $\overline{x}_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. We also define $\overline{x}_{j}$ to be the next state, i.e. $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$. If $\overline{x}_{j}\not\in X$, we apply interpolation to determine the value function at $\overline{x}_{j}$.
 
-We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,j}(u_{p})=P(x_{j}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $x_{j}$ by applying control $u_{p}\in U$. For $p_{i,j}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{j}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
+We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings, as described in \cite[p.~319]{MultiLinInterp} and elsewhere. To  compute the policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for each control $u_{p}$. This is to say that if we let $x_{\delta}$ be any state in $X$ and $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$ be the state at time $t+1$, the entry $(j,\delta)$ of $F_{p}$ contains the weight of $J_{t+1}(x_{\delta})$ that contributes to $J_{t+1}(\overline{x}_{j})$. Note that $\delta\in\{1,...,NM\}$.
+
+We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,\gamma}(u_{p})=P(x_{\gamma}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $\overline{x}_{\gamma}\in \chi$ by applying control $u_{p}\in U$. Note that $\gamma\in\{1,...M^{2}NP\}$. For $p_{i,\gamma}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{\gamma}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
 \begin{equation} \label{eq:TransMtx}
-p_{i,j}(u_{p})=
+p_{i,\gamma}(u_{p})=
 \left\{
 \begin{array}{l}
-P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p},w_{k})\\
+P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{\gamma}=f(x_{i},u_{p},w_{k})\\
 0 \hspace{2.0cm} \text{otherwise}
 \end{array}
 \right.
-\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries are $p_{i,j}(u_{p})$ for control $u_{p}$.
-%in the $p^{th}$ subset of rows 
+\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries are $p_{i,\gamma}(u_{p})$ for control $u_{p}$.
+%in the $p^{th}$ subset of rows
 
 
 
