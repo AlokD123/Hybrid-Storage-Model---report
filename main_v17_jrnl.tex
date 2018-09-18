@@ -107,33 +107,33 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
 
 In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1)$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define four sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; $X_{1}$ as the set of discrete energy levels $E_{1}$, indexed by $l \in\{1,...,N_{1}\}$; $X_{2}$ as the set of discrete energy levels $E_{2}$, indexed by $m \in\{1,...,N_{2}\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=X_{1}\times X_{2}\times W$. We index $X$ by the linear index $i\in\{1,...,NM\}$, or equivalently by the triplet of indices $(l,m,k)$. We use subscripts to index the elements in each set, e.g., $x_{i}$ is the $i^{\text{th}}$ element in set $X$.
+Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use multilinear interpolation according to \cite[p.~319]{MultiLinInterp} to determine the value function at the state $x(t+1)\not\in X$. First, we define four sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; $X_{1}$ as the set of discrete energy levels $E_{1}$, indexed by $l \in\{1,...,N_{1}\}$; $X_{2}$ as the set of discrete energy levels $E_{2}$, indexed by $m \in\{1,...,N_{2}\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=X_{1}\times X_{2}\times W$. We index $X$ by the linear index $i\in\{1,...,NM\}$, or equivalently by the triplet of indices $(l,m,k)$. We use subscripts to index the elements in each set, e.g., $x_{i}$ is the $i^{\text{th}}$ element in set $X$.
 
-Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $x_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. If $x_{j}=f(x_{i},u_{p},w_{k})$ is the next state and $x_{j}\not\in X$, we apply interpolation according to \cite[p.~319]{MultiLinInterp} to determine the value function at $x_{j}$:
+Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $\overline{x}_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}N\rho\}$. We also define $\overline{x}_{j}$ to be the next state, i.e. $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$. If $\overline{x}_{j}\not\in X$, we apply interpolation to determine the value function at $\overline{x}_{j}$:
 \begin{equation} \label{eq:InterpMap}
-	J_{t+1}(x_{j})=\sum_{i'}^{MN}q_{i',j}J_{t+1}(x_{i'})
-\end{equation} Here, $x_{i'}$ is any vector in $X$ and $q_{i',j}$ are interpolation weights. In our numerical examples, we use multilinear interpolation.
+	J_{t+1}(\overline{x}_{j})=\sum_{\delta}^{MN}q_{\delta,j}J_{t+1}(x_{\delta})
+\end{equation} Here, $\delta\in\{1,...,NM\}$ such that $x_{\delta}$ is any vector in $X$, and $q_{\delta,j}$ are interpolation weights.%In our numerical examples, we use multilinear interpolation.
 
-First, note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $a_{l}$ be the $l^{\text{th}}$ value of energy $E_{1}$, $b_{m}$ be the $m^{\text{th}}$ value of energy $E_{2}$, and $L_{k}$ be the $k^{\text{th}}$ demand in the set $W$. Then, we represent $x_{i}=x_{l,m,k}$ in terms of its coordinates as $[a_{l},b_{m},L_{k}]^{T}$. Note that $x_{i}$ and $x_{l,m,k}$ refer to the same state because we use the linear index $i$ for the set $X$, which is equivalent to standard indexing with $(l,m,k)$. Similarly to $x_{i}$, we represent $x_{j}$ as $[a,b,L']^{T}$. Here $a\in\mathbb{R}$ and $b\in\mathbb{R}$ are, respectively, the energies $E_{1}$ and $E_{2}$ associated with the $j^{\text{th}}$ state, and $L'$ is a demand in the set $W$.
+We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings. Let $x_{\delta}$ be any arbitrary state in $X$, such that $\delta\in\{1,...,NM\}$ and $\delta$ may or may not equal $i$. Let $a_{l}$ be the $l^{\text{th}}$ value of energy $E_{1}$, $b_{m}$ be the $m^{\text{th}}$ value of energy $E_{2}$, and $L_{k}$ be the $k^{\text{th}}$ demand in the set $W$. Then, we represent $x_{\delta}=x_{l,m,k}$ in terms of its coordinates as $[a_{l},b_{m},L_{k}]^{T}$. Note that $x_{\delta}$ and $x_{l,m,k}$ refer to the same state because we use the linear index $\delta$ for the set $X$, which is equivalent to standard indexing with $(l,m,k)$. Similarly to $x_{\delta}$, we represent $\overline{x}_{j}$ as $[a,b,L']^{T}$. Here $a\in\mathbb{R}$ and $b\in\mathbb{R}$ are, respectively, the energies $E_{1}$ and $E_{2}$ associated with the $j^{\text{th}}$ state in $\chi$, and $L'$ is a demand in the set $W$.
 
-Then, the interpolation weights are $q_{i',j}=q_{l,m,k,j}$, where:
-%\begin{displaymath}q_{l,m,j}=
+Then, the interpolation weights are $q_{\delta,j}=q_{l,m,k,j}$, where:
+\begin{displaymath}q_{l,m,k,j}=
 %\left\{
 %\begin{array}{l}
-%\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big)\\ \text{if} \hspace{0.1cm} a_{l}\leq a_{j}<a_{l+1},b_{m}\leq b<b_{m+1}, L_{k}=L_{n}\\\\
-%0		   \hspace{4.8cm} \text{otherwise}
+\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big)\Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big)%\\ \text{if} \hspace{0.1cm} a_{l}\leq a_{j}<a_{l+1},b_{m}\leq b<b_{m+1}, L'=L_{k}
+%\\\\0		   \hspace{4.8cm} \text{otherwise}
+%\end{array}
+%\right.
+\end{displaymath} if $a_{l}\leq a_{j}<a_{l+1}$, $b_{m}\leq b<b_{m+1}$, and $L'=L_{k}$. Note that $q_{\delta,j}$ and $q_{l,m,k,j}$ refer to the same quantity for the same reasons that $x_{\delta}$ is the same quantity as $x_{l,m,k}$. For clarity, we suppress adding a subscript $p$ to $q_{l,m,k,j}$ that would indicate its dependence on the control $u_{p}$.
+
+%\begin{displaymath}q_{l,m,k,j}=
+%\left\{
+%\begin{array}{l}
+%\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{0.7cm} \text{if} \hspace{0.1cm} a_{l}\leq a< a_{l+1},L'=L_{k},\\ \times \Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.8cm}b_{m}\leq b< b_{m+1}\\\\
+%0		   \hspace{5.2cm} \text{otherwise}
 %\end{array}
 %\right.
 %\end{displaymath}
-
-\begin{displaymath}q_{l,m,k,j}=
-\left\{
-\begin{array}{l}
-\Big(1-\frac{a-a_{l}}{a_{l+1}-a_{l}}\Big) \hspace{0.7cm} \text{if} \hspace{0.1cm} a_{l}\leq a< a_{l+1},L'=L_{k},\\ \times \Big(1-\frac{b-b_{m}}{b_{m+1}-b_{m}}\Big) \hspace{1.8cm}b_{m}\leq b< b_{m+1}\\\\
-0		   \hspace{5.2cm} \text{otherwise}
-\end{array}
-\right.
-\end{displaymath} Note that $q_{i',j}$ and $q_{l,m,k,j}$ refer to the same quantity for the same reasons that $x_{i}$ is the same quantity as $x_{l,m,k}$.
 
 %\begin{displaymath}q_{l,m,j}=
 %\left\{
@@ -144,28 +144,28 @@ Then, the interpolation weights are $q_{i',j}=q_{l,m,k,j}$, where:
 %\right.
 %\end{displaymath} Here, $a_{j}$ and $b_{j}$ are coordinates of the point $x_{j}\not\in X$.
 
-To compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for control $u_{p}$ as follows:
+To compute the optimal policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for control $u_{p}$. The entry $(j,\delta)$ of that matrix is as follows:
 \begin{displaymath}
-F_{j,i,p}=
+F_{j,\delta,p}=
 \left\{
 \begin{array}{l}
-1		   \hspace{1cm} \text{if} \hspace{0.2cm}x_{j}=x_{i}\\
+1		   \hspace{1cm} \text{if} \hspace{0.2cm}\overline{x}_{j}=x_{\delta}\\
 q_{l,m,k,j}\hspace{0.1cm} \text{if} \hspace{0.1cm} a_{l}\leq a<a_{l+1}, b_{m}\leq b<b_{m+1},L'=L_{k}\\
 0		   \hspace{1cm} \text{otherwise}
 \end{array}
 \right.
 \end{displaymath}%Here $x_{i}\in X$ and so can be expressed as $x_{i}=(a_{l},b_{m},L)$ for any $L\in W$. However, $x_{j}$ may not belong to X, and so is expressed as $x_{j}=(a_{j},b_{j},L)$ for any $L\in W$.
 
-We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,j}(u_{p})=P(x_{j}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $x_{j}$ by applying control $u_{p}\in U$. For $p_{i,j}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{j}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
+We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,\gamma}(u_{p})=P(x_{\gamma}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $\overline{x}_{\gamma}\in \chi$ by applying control $u_{p}\in U$. Note that $\gamma\in\{1,...M^{2}N\rho\}$. For $p_{i,\gamma}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{\gamma}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
 \begin{equation} \label{eq:TransMtx}
-p_{i,j}(u_{p})=
+p_{i,\gamma}(u_{p})=
 \left\{
 \begin{array}{l}
-P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{j}=f(x_{i},u_{p},w_{k})\\
+P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{\gamma}=f(x_{i},u_{p},w_{k})\\
 0 \hspace{2.0cm} \text{otherwise}
 \end{array}
 \right.
-\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries are $p_{i,j}(u_{p})$.  
+\end{equation} We express this as a transition probability matrix $P_{p}$, whose entries are $p_{i,\gamma}(u_{p})$ for control $u_{p}$.
 
 
 
@@ -244,7 +244,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
             0 \hspace{0.2cm} \text{if} \hspace{0.2cm} i\not\in H_{j}
             \end{array}
             \right.
-    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(i)r_{j}\}=\{i|e_{j} = b(i)\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{\text{th}}$ aggregation (basis function).
+    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(x_{i})r_{j}\}=\{i|e_{j} = b(x_{i})\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{\text{th}}$ aggregation (basis function).
 	
 	Note that in order to determine one possible function $b(x_{i})$ for the given model, we run value iteration an arbitrary number of times to approximate $J^{*}_{j}(x_{i})$. This allows us to identify possible state aggregations.
     

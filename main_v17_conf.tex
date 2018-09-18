@@ -107,18 +107,18 @@ starting from $J_{T}(x(T))=0$. This is subject to the same constraints as \eqref
 
 In this model, $L(t)$ is a random quantity which is observed at time $t$ before the control $u(t)$ is applied because the controller must have full knowledge of the demand. It evolves according to $L(t+1)=w(t)$. Note that $w(t)$ depends on the energy in the subsequent state, $E_{1}(t+1)$ and $E_{2}(t+1)$. This is because the demand at any iteration cannot exceed the total current energy at that iteration. Based on this requirement, the random demand is bounded to the range $0\leq L \leq L^{\max}=E_{1}^{\max}+E_{2}^{\max}$. It is also discretized into $M=N_{1}+N_{2}$ levels in accordance with the discretization of $E_{h}$.
 
-Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\gamma \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
+Let $X$ be the set of values the discretized state, $x(t)$, can take. As the state evolves with each iteration of the DP, the subsequent state, $x(t+1)=f(x(t),u(t),w(t))$, may not lie in $X$. We use interpolation to determine the value function at the state $x(t+1)\not\in X$. First, we define three sets: $W$ as the set of random demands, indexed by $k\in\{1,...,M\}$; Y as the set of points $[E_{1},E_{2}]^{T}$, indexed by $\tau \in\{1,...,N\}$; and $U$ as the set of controls, indexed by $p\in\{1,...,\rho\}$. By the above definition, $X=Y\times W$. We index $X$ by $i\in\{1,...,NM\}$. We use subscripts to index the elements each set, e.g., $x_{i}$ is the $i^{th}$ element in set $X$.
 
-Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $\overline{x}_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}NP\}$. We also define $\overline{x}_{j}$ to be the next state, i.e. $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$. If $\overline{x}_{j}\not\in X$, we apply interpolation to determine the value function at $\overline{x}_{j}$.
+Let $x_{i}$ be the state at time $t$. Let $\chi$ be the set of states that are reached from any state $x_{i}\in X$ with any control $u_{p}\in U$ and any demand $w_{k}\in W$ by the state transition $f(x_{i},u_{p},w_{k})$. Let $\overline{x}_{j}$ be the $j^{\text{th}}$ state in the set $\chi$, where $j\in \{1,...,M^{2}N\rho\}$. We also define $\overline{x}_{j}$ to be the next state, i.e. $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$. If $\overline{x}_{j}\not\in X$, we apply interpolation to determine the value function at $\overline{x}_{j}$.
 
 We note that no interpolation is needed for the demand, $L(t)$, because it is drawn from a discrete distribution. Hence, we use bilinear interpolation for the weightings, as described in \cite[p.~319]{MultiLinInterp} and elsewhere. To  compute the policy, we can encode the interpolation scheme in a constant matrix $F_{p}$ for each control $u_{p}$. This is to say that if we let $x_{\delta}$ be any state in $X$ and $\overline{x}_{j}=f(x_{i},u_{p},w_{k})$ be the state at time $t+1$, the entry $(j,\delta)$ of $F_{p}$ contains the weight of $J_{t+1}(x_{\delta})$ that contributes to $J_{t+1}(\overline{x}_{j})$. Note that $\delta\in\{1,...,NM\}$.
 
-We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,\gamma}(u_{p})=P(x_{\gamma}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $\overline{x}_{\gamma}\in \chi$ by applying control $u_{p}\in U$. Note that $\gamma\in\{1,...M^{2}NP\}$. For $p_{i,\gamma}(u_{p})$ to be non-zero, the next state $x_{j}$ must be accessible from the current state, i.e., $x_{\gamma}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
+We express our model as a Markov chain to enable a linear programming formulation. Let $p_{i,\gamma}(u_{p})=P(\overline{x}_{\gamma}| x_{i},u_{p})$ be the probability of moving from $x_{i}\in X$ to $\overline{x}_{\gamma}\in \chi$ by applying control $u_{p}\in U$. Note that $\gamma\in\{1,...M^{2}N\rho\}$. For $p_{i,\gamma}(u_{p})$ to be non-zero, the state $\overline{x}_{\gamma}$ must be accessible from the current state, i.e., $\overline{x}_{\gamma}=f(x_{i},u_{p},w_{k})$. The only random variable in $f(x_{i},u_{p},w_{k})$ is $w_{k}\in W$, so we may express this instead as a probability of $w_{k}$, which is $P(w_{k} | x_{i},u_{p})$. The transition probability is then:
 \begin{equation} \label{eq:TransMtx}
 p_{i,\gamma}(u_{p})=
 \left\{
 \begin{array}{l}
-P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} x_{\gamma}=f(x_{i},u_{p},w_{k})\\
+P(w_{k}|x_{i},u_{p}) \hspace{0.3cm} \text{if} \hspace{0.2cm} \overline{x}_{\gamma}=f(x_{i},u_{p},w_{k})\\
 0 \hspace{2.0cm} \text{otherwise}
 \end{array}
 \right.
@@ -182,7 +182,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
 	
 	\begin{displaymath}
         \Phi_{i,j}=x_{i}^{j-1}
-    \end{displaymath} Here $i$ is the state index and $j$ is the column index. %, and $s(i)$ is a function which maps the state index to the associated state. %Again, a trade-off exists for increasing the value of $R$ between more decision variables and lower approximation error.
+    \end{displaymath} Here $i$ is the state index and $j$ is the column index. The exponentiation notation is used here to indicate that each of the elements of the state (i.e. $E_{1}, E_{2}$ and $L$) are raised to the same power, $j-1$. %, and $s(i)$ is a function which maps the state index to the associated state. %Again, a trade-off exists for increasing the value of $R$ between more decision variables and lower approximation error.
 
 %\subsection{Random Vectors}
     %It is known that adding any linearly independent vector to an existing basis is guaranteed to decrease the approximation error. For that reason, we can sample randomly generated vectors until determining an additional vector that is linearly independent from the current basis, and subsequently add it to the basis. We can repeat this an arbitrary number of times to improve the approximation.
@@ -194,7 +194,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
     We use the heuristic of state aggregation to reduce the number of decision variables down to the number of aggregations of states \cite{5717627}. This is a less computationally expensive alternative to principal component analysis for this multidimensional problem, which is what \cite{PCA2015} and others apply to generate the basis functions for problems of lower dimension.%Specifically, each state in the aggregation has an associated index, so the basis functions are many-to-one functions of the state index $i$.
     
     Appropriate state aggregations depend on the problem, since the optimal value function varies. %By grouping state indices giving constant values of a function $b(i)$, we can determine the minimum number of aggregations to approximate the value function.
-    However, each aggregation is defined to have approximate the same value of $\phi_{j}(x_{i})r_{j}$ for all states $x_{i}$ in that aggregation, where $j$ is the index of the aggregation. This implies that the matrix $\Phi$ must have the form:
+    However, each aggregation is defined to have approximately the same value of $\phi_{j}(x_{i})r_{j}$ for all states $x_{i}$ in that aggregation, where $j$ is the index of the aggregation. This implies that the matrix $\Phi$ must have the form:
     
     \begin{displaymath}
         \Phi_{i,j}=\left\{
@@ -203,7 +203,7 @@ We use a combination of two types of basis functions: monomials, and vectors bas
             0 \hspace{0.2cm} \text{if} \hspace{0.2cm} i\not\in H_{j}
             \end{array}
             \right.
-    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(i)r_{j}\}=\{i|e_{j} = b(i)\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{th}$ aggregation (basis function).
+    \end{displaymath}where $H_{j}$ is the set $\{i|f_{j} = \phi_{j}(x_{i})r_{j}\}=\{i|e_{j} = b(x_{i})\}$. Here, $b(x_{i})$ is a model-specific function that is appropriately chosen to maximize the number of elements in $H_{j}$ for each $j$. $f_{j}$ and $e_{j}$ are, respectively, the approximate optimal value and the constant value of $b(x_{i})$ associated with the $j^{th}$ aggregation (basis function).
 	
 	Note that in order to determine one possible function $b(x_{i})$ for the given model, we run value iteration an arbitrary number of times to approximate $J^{*}_{j}(x_{i})$. This allows us to identify possible state aggregations.
     
